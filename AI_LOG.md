@@ -1,29 +1,31 @@
 # AI log
 
-Every substantive use of an AI assistant, as rule R1 requires.
+Every substantive use of an AI assistant (rule R1), with what I checked.
 
-| Date | Tool | Task | What I checked |
+## Uses
+
+| Date | Tool | Used for | How I checked it |
 |---|---|---|---|
-| 2026-10/11 | another AI assistant (`<name it>`) | First draft of the Theory answers (answer sheets and working) | Every number re-derived by script (`theory/check_numbers.py`); proofs read line by line; three problems found (below) |
-| 2026-11-07 | Claude Code (Claude Opus 5.5) | Planning: read the paper, proposed choosing E1/E2/E4 and the repo layout | Choice of experiments checked against the core battery table in M.C |
-| 2026-11-07 | Claude Code | Rewrote the Theory answers with the corrections below; wrote `check_numbers.py` and the PDF build | Ran the checks (all 32 values pass); read both PDFs |
-| 2026-11-07 | Claude Code | Wrote the code in `common/`, `E1/`, `E2/`, `E4/`, `E6/` and `main/` (Φ, readouts, baselines, battery, runner) | Smoke tests on toy data: E1 validator on the paper's example item; E2 measures on toy pools (time cut-off, concentration, copy); E4 evalkit on synthetic reviews; Φ end to end on a toy index (all readouts, update rule, S3) |
-| 2026-11-07/08 | Claude Code | Drafted README, NOTEBOOK and PREREG, including the predictions (drafted by Claude, read and accepted by me before the commit) | Removed the E4 ceiling prediction because the ceiling had already been computed |
-| 2026-11-08 | Claude Code | Found public data mirrors, wrote `data/convert_hf.py`, ran the E4 ceiling and the preparation steps | Sources listed in convert_hf.py; deviations in NOTEBOOK.md |
-| | | **E1 items: written by hand, no AI** | |
+| Oct–Nov 2026 | `<name the other AI>` | First draft of the Theory answers (answer sheets and working for T1–T5) | Re-derived every number with a script; read every proof; found 3 errors (below) |
+| 7 Nov 2026 | Claude Code (Claude Opus 5.5) | Reading the paper with me and planning: choosing E1/E2/E4 (+E6) and the repo layout | Checked that the three experiments cover the core tests of the Main Problem battery (I1, S1, A1, H3, O1) |
+| 7 Nov 2026 | Claude Code | Corrected and rewrote the Theory answers; wrote `theory/check_numbers.py` and the PDF build | All 32 numerical answers pass the script; read both PDFs |
+| 7 Nov 2026 | Claude Code | Wrote the code: shared library (`common/`), E1 checker and evaluation, E2 novelty measures and pool manipulations, E4 evaluation kit, E6 pipeline arms, and the Main Problem (Φ, readouts, baselines, test battery, runner) | Smoke tests on toy data: E1 checker on the paper's example; E2 time cut-off, concentration and copy on toy pools; E4 kit on synthetic reviews; Φ end to end on a toy index |
+| 7–8 Nov 2026 | Claude Code | Drafted README, NOTEBOOK and PREREG, including the predictions | I read and accepted the predictions before committing. The E4 ceiling prediction was removed because the ceiling had already been computed |
+| 8 Nov 2026 | Claude Code | Found public data mirrors (ICLR 2024–2026 reviews, novelty-judge-bench, arXiv snapshot), wrote `data/convert_hf.py`, measured CPU speed, ran the E4 ceiling and the preparation steps | Sources are listed in `convert_hf.py`; every deviation (rating instead of contribution, topic clusters, smaller local samples) is in NOTEBOOK.md |
+| 8 Nov 2026 | Claude Code + fixed prompt `EXTRACT_RQ` | E1 workbook: selected 75 real 2025 arXiv papers and extracted question A with the one fixed prompt | I edit every A by hand. B, B_min, C, C_tilde, narrower and broader are written by hand, without AI |
 
 ## AI errors caught
-1. **T5 B.1 (other assistant's draft).** The "far" question was a Mars-microbe question given prior π = 0.99
-   ("settled"), but the existing reports were about contrastive learning, so nothing in them could settle it.
-   The example was internally inconsistent. It was replaced by a question whose measurement does not depend on
-   H (a = b), which gives v = 0 by construction (`check_numbers.py` verifies v = 0).
-2. **Theory draft claimed "all values checked by script"**, but no script existed. One was written, and it
-   confirmed every value.
-3. **T2 A.1 grouping (draft)** put measure 7 (later papers do something similar) and 10 (uptake) in one group,
-   though they answer different questions: "ahead of its time?" versus "did others build on it?". Split into G6/G7.
-4. **Claude, E2 `novelty.py` first version:** the calibration level b was recomputed from each pool. Planting a
-   claim could then raise b and so *raise* novelty, which contradicts the monotonicity proof in T2 B.4. Caught
-   while reviewing the code against the proof; b is now frozen in `calib.json`.
-5. **Claude, `PhiModel.same_question` first version** returned a rescaled cosine on one branch that was not a
-   probability, so it was not comparable with the cross-encoder output. Rewritten to pre-filter on cosine and let
-   the cross-encoder decide.
+1. **T5 B.1 (other AI).** The "far" question was given prior π = 0.99 ("settled"), but the reports were about
+   contrastive learning, so nothing in them could settle it. Replaced with a question whose measurement does not
+   depend on H (a = b, so v = 0).
+2. **Theory draft (other AI)** said all numbers were "checked by script", but no script existed. I wrote
+   `check_numbers.py`; all values pass.
+3. **T2 A.1 (other AI)** put measures 7 (later papers do something similar) and 10 (uptake) in one group, though
+   they answer different questions. Split them into G6 and G7.
+4. **E2 `novelty.py` (Claude).** The first version recalibrated the background cosine for each pool, so adding a
+   paper could *raise* novelty. That contradicts the monotonicity proof in T2 B.4. The calibration is now
+   computed once and frozen.
+5. **`PhiModel.same_question` (Claude).** One branch returned a rescaled cosine that was not a probability. It was
+   rewritten so the cross-encoder makes the decision.
+6. **Process (Claude).** Two test-set evaluations were started before PREREG.md was committed. They were stopped
+   before writing any result, and this is recorded in NOTEBOOK.md.
