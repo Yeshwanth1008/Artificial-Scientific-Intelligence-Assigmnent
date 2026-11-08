@@ -10,6 +10,7 @@ Sources (public, downloaded with curl into data/cache/hf/):
 Neither ICLR mirror carries the contribution / soundness sub-scores, so only the overall rating is available
 (deviation recorded in NOTEBOOK.md). No copy of these data is committed (rule R7).
 """
+import json
 import re
 import sys
 from pathlib import Path
@@ -100,5 +101,42 @@ def arxiv(cats=("cs.LG", "cs.CL", "cs.CV", "cs.AI", "cs.RO", "stat.ML"), since=2
     print(n, "papers ->", out)
 
 
+HYPO_TASKS = {"real": ["headline_binary", "deceptive_reviews", "persuasive_pairs", "retweet", "journal_same",
+                       "gptgc_detect", "dreaddit"],
+              "synthetic": ["shoe", "admission", "election", "preference"]}
+
+
+def hypobench():
+    """ChicagoHAI/HypoGeniC-datasets (the HypoBench task family [R44]) -> data/hypobench/<task>/{train,test}.jsonl.
+    Each file is a dict of columns; the label column is 'label', the others are joined into the example text.
+    For synthetic tasks, metadata.json describes the planted rule; its text is stored as planted.txt."""
+    import requests
+    base = "https://huggingface.co/datasets/ChicagoHAI/HypoGeniC-datasets"
+    root = Path(__file__).parent / "hypobench"
+    for kind, tasks in HYPO_TASKS.items():
+        for t in tasks:
+            files = requests.get(f"https://huggingface.co/api/datasets/ChicagoHAI/HypoGeniC-datasets/tree/main/{kind}/{t}",
+                                 timeout=60).json()
+            names = [f["path"] for f in files if isinstance(f, dict) and f.get("type") == "file"]
+            got = {}
+            for split in ("train", "test"):
+                cand = [n for n in names if n.endswith(f"_{split}.json")]
+                if not cand:
+                    continue
+                j = requests.get(f"{base}/resolve/main/{cand[0]}", timeout=120).json()
+                cols = [c for c in j if c != "label"]
+                rows = [{"text": " | ".join(f"{c}: {j[c][i]}" for c in cols), "label": str(j["label"][i])}
+                        for i in range(len(j["label"]))]
+                write_jsonl(root / t / f"{split}.jsonl", rows)
+                got[split] = len(rows)
+            meta = [n for n in names if n.endswith("metadata.json")]
+            if kind == "synthetic" and meta:
+                m = requests.get(f"{base}/resolve/main/{meta[0]}", timeout=60).json()
+                gt = m.get("ground_truth_hypotheses") or []
+                if gt:
+                    (root / t / "planted.txt").write_text(" ".join(map(str, gt)), encoding="utf-8")
+            print(kind, t, got)
+
+
 if __name__ == "__main__":
-    {"iclr": iclr, "njb": njb, "arxiv": arxiv}[sys.argv[1]]()
+    {"iclr": iclr, "njb": njb, "arxiv": arxiv, "hypobench": hypobench}[sys.argv[1]]()

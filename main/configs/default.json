@@ -1,6 +1,6 @@
 {
-  "n_iclr":   {"train": 3000, "select": 1500, "test": 3000},
-  "n_uptake": {"train": 3000, "select": 1000, "test": 1500},
+  "n_iclr":   {"train": 0, "select": 0, "test": 0},
+  "n_uptake": {"train": 0, "select": 0, "test": 0},
   "encoder": "Qwen/Qwen3-Embedding-0.6B",
   "cross_encoder": "Qwen/Qwen3-Reranker-0.6B",
   "llm": "Qwen/Qwen2.5-1.5B-Instruct",

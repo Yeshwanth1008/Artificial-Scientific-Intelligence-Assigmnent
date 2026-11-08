@@ -41,7 +41,14 @@ def _pairacc_paired(pred_a, pred_b, target, topics, min_len_gap=None, lengths=No
 
 # ====================================================================== Invariance
 
+def _need_e1(ctx, n=60):
+    items = ctx.e1_items()
+    return None if len(items) >= n else {"not_run": f"E1 has {len(items)} hand-written items (needs {n})"}
+
+
 def I1_paraphrase(ctx: Ctx):
+    if _need_e1(ctx):
+        return _need_e1(ctx)
     items = ctx.e1_items()
     ids = [it["id"] for it in items]
     P = {f: [ctx.phi_text(it[f], T_E1) for it in items] for f in ("A", "B", "B_min", "C")}
@@ -99,6 +106,8 @@ def I4_order_format(ctx: Ctx, n=200):
 # ====================================================================== Sensitivity
 
 def S1_nearmiss(ctx: Ctx):
+    if _need_e1(ctx):
+        return _need_e1(ctx)
     items = ctx.e1_items()
     ids = [it["id"] for it in items]
     P = {f: [ctx.phi_text(it[f], T_E1, with_novelty=False) for it in items] for f in ("A", "B", "B_min", "C", "C_tilde")}
@@ -132,6 +141,8 @@ def S1_nearmiss(ctx: Ctx):
 
 
 def S2_facet_edits(ctx: Ctx, n=60):
+    if _need_e1(ctx):
+        return _need_e1(ctx)
     from common.llm import LLM
     from common.prompts import FACET_EDIT
     desc = {"purpose": "what problem it addresses", "mechanism": "how it would be addressed",
@@ -153,6 +164,8 @@ def S2_facet_edits(ctx: Ctx, n=60):
 
 
 def S3_time(ctx: Ctx, n=150):
+    if _need_e1(ctx):
+        return _need_e1(ctx)
     """An equivalent earlier paper lowers N; the same paper dated later leaves N unchanged."""
     items = ctx.e1_items()[:n]
     lower, same = [], []

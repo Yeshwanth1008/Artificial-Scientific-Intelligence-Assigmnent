@@ -71,16 +71,14 @@ def cmd_data():
 
 
 def cmd_cards():
-    from common.io import append_jsonl
+    """(i) question and (ii) card for every paper of the fixed subsample, one fixed prompt each, batched."""
+    from common.extract import card_many, rq_many
     llm = extractor()
-    f = HERE / "cards.jsonl"
-    done = {r["paper_id"] for r in read_jsonl(f)} if f.exists() else set()
-    for p in papers():  # resumable: one line appended per paper
-        if p["paper_id"] in done:
-            continue
-        append_jsonl(f, {"paper_id": p["paper_id"], "year": p["year"],
-                         "rq": extract_rq(llm, p["title"], p["abstract"]),
-                         "card": extract_card(llm, p["title"], p["abstract"])})
+    P = papers()
+    rqs, cards = rq_many(llm, P), card_many(llm, P)
+    write_jsonl(HERE / "cards.jsonl", [{"paper_id": p["paper_id"], "year": p["year"], "rq": q, "card": c}
+                                       for p, q, c in zip(P, rqs, cards)])
+    print(len(P), "cards")
 
 
 def _views(P, cards):

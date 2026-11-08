@@ -35,6 +35,13 @@ class LitIndex:
         self.meta, self.X = meta, X
         self.dates = np.array([m["date"] for m in meta])
         self.E = Embedder("qwen3-0.6b", use_prompt=False)
+        self._gpu = None
+        try:
+            import torch
+            if torch.cuda.is_available():  # whole index on the GPU in fp16: a search is one matrix-vector product
+                self._gpu = torch.from_numpy(np.ascontiguousarray(X)).to("cuda", torch.float16)
+        except Exception:
+            self._gpu = None
 
     @classmethod
     def build(cls, start="2018-01-01", end="2026-12-31", max_papers=None):
@@ -43,13 +50,11 @@ class LitIndex:
         if max_papers and len(rows) > max_papers:  # small tier: uniform subsample, documented in README
             rng = random.Random(0)
             rows = sorted(rng.sample(rows, max_papers), key=lambda r: r["date"])
-        E = Embedder("qwen3-0.6b", use_prompt=False, batch_size=64)
-        X = None
-        for i in range(0, len(rows), 4096):
-            chunk = E([f"{r['title']}. {r['abstract']}" for r in rows[i:i + 4096]])
-            if X is None:
-                X = np.zeros((len(rows), chunk.shape[1]), np.float16)
-            X[i:i + 4096] = chunk
+        from common.embed import _load
+        model = _load("qwen3-0.6b")       # encode directly: no per-text cache files for 10^5 papers
+        model.max_seq_length = 256         # title + first part of the abstract
+        X = model.encode([f"{r['title']}. {r['abstract']}" for r in rows], batch_size=128, normalize_embeddings=True,
+                         show_progress_bar=True, convert_to_numpy=True).astype(np.float16)
         IDX.mkdir(parents=True, exist_ok=True)
         np.save(IDX / "X.npy", X)
         write_jsonl(IDX / "meta.jsonl", [{k: r[k] for k in ("id", "date", "title", "abstract", "authors")} for r in rows])
@@ -64,7 +69,11 @@ class LitIndex:
         lo = np.searchsorted(self.dates, t_after, side="right") if t_after else 0
         if hi <= lo:
             return []
-        s = np.asarray(self.X[lo:hi], dtype=np.float32) @ v
+        if self._gpu is not None:
+            import torch
+            s = (self._gpu[lo:hi] @ torch.from_numpy(np.asarray(v, np.float16)).to("cuda")).float().cpu().numpy()
+        else:
+            s = np.asarray(self.X[lo:hi], dtype=np.float32) @ v
         top = np.argsort(-s)[:k + len(exclude)]
         out = []
         for j in top:
@@ -111,31 +120,34 @@ def get_R(title, t, index, k_retrieve=10):
     return [{"title": g["title"], "abstract": g["abstract"], "date": g["date"]} for g in got], "retrieved"
 
 
-def build_iclr():
-    import datetime
+ICLR_T = {2024: "2023-09-28", 2025: "2024-10-01", 2026: "2025-09-24"}   # submission deadlines (mirrors lack cdate)
+
+
+def build_iclr(k_retrieve=10):
+    """ICLR items = the fixed E4 subsample (2000/1000/2000), q = the E4 question (fixed prompt), facets batched.
+    R: the public mirrors have no reference lists, so R is retrieved -- the k nearest arXiv papers dated before
+    the submission deadline (setting (b) rule of M.A; r_source = 'retrieved')."""
+    sys.path.insert(0, str(HERE.parent / "E4"))
+    from run_e4 import papers
+    from common.extract import facets_many
     index = LitIndex.load()
     cards = {r["paper_id"]: r for r in read_jsonl(HERE.parent / "E4" / "cards.jsonl")}
-    llm = extractor()
-    out = HERE / "items_iclr.jsonl"
-    done = {r["id"] for r in read_jsonl(out)} if out.exists() else set()
-    rows = read_jsonl(out) if out.exists() else []
-    for y in (2024, 2025, 2026):
-        for p in load_iclr(y):
-            if p["paper_id"] in done or p["paper_id"] not in cards:
-                continue
-            t = datetime.datetime.utcfromtimestamp(p["cdate"] / 1000).strftime("%Y-%m-%d")
-            c = cards[p["paper_id"]]
-            R, src = get_R(p["title"], t, index)
-            sc = {k: float(np.nanmean([r[k] for r in p["reviews"] if r.get(k) is not None] or [np.nan]))
-                  for k in ("rating", "contribution", "soundness")}
-            rows.append({"id": p["paper_id"], "year": y, "split": {2024: "train", 2025: "select", 2026: "test"}[y],
-                         "t": t, "q": c["rq"], "card": c["card"], "facets": extract_facets(llm, c["rq"]),
-                         "title": p["title"], "abstract": p["abstract"], "topic": p.get("primary_area") or "unknown",
-                         "R": R, "r_source": src, "scores": sc, "n_reviews": len(p["reviews"]),
-                         "reviews": p["reviews"]})
-            if len(rows) % 100 == 0:
-                write_jsonl(out, rows)
-    write_jsonl(out, rows)
+    P = [p for p in papers() if p["paper_id"] in cards]
+    facets = facets_many(extractor(), [cards[p["paper_id"]]["rq"] for p in P])
+    rows = []
+    for p, fa in zip(P, facets):
+        y = p["year"]
+        t = ICLR_T[y]
+        got = index.search(f"{p['title']}. {p['abstract']}", t, k=k_retrieve)
+        R = [{"title": g["title"], "abstract": g["abstract"], "date": g["date"]} for g in got]
+        sc = {k: float(np.nanmean([r[k] for r in p["reviews"] if r.get(k) is not None] or [np.nan]))
+              for k in ("rating", "contribution", "soundness")}
+        rows.append({"id": p["paper_id"], "year": y, "split": {2024: "train", 2025: "select", 2026: "test"}[y],
+                     "t": t, "q": cards[p["paper_id"]]["rq"], "card": cards[p["paper_id"]]["card"], "facets": fa,
+                     "title": p["title"], "abstract": p["abstract"], "topic": p["topic"], "R": R,
+                     "r_source": "retrieved", "scores": sc, "n_reviews": len(p["reviews"])})
+    write_jsonl(HERE / "items_iclr.jsonl", rows)
+    print(len(rows), "ICLR items")
 
 
 # ------------------------------------------------------------------ uptake items
@@ -171,31 +183,47 @@ def uptake_12m(arxiv_id, date, authors):
 
 
 def build_uptake(n_per_split=None):
+    """arXiv items with 12-month author-disjoint citation counts and references (Semantic Scholar batch, no key)."""
+    from common.data_sources import s2_batch
+    from common.extract import facets_many, rq_many
+    import datetime
     n_per_split = n_per_split or {"train": 3000, "select": 1000, "test": 1500}
     index = LitIndex.load()
-    llm = extractor()
     rng = random.Random(0)
-    from common.extract import extract_rq
-    rows = []
+    picked = []
     for split, (a, b) in SPLITS_UPTAKE.items():
         cand = [m for m in index.meta if a <= m["date"] <= b]
-        for m in rng.sample(cand, min(n_per_split[split], len(cand))):
-            u = uptake_12m(m["id"], m["date"], m["authors"])
-            if u is None:
+        picked += [(split, m) for m in rng.sample(cand, min(n_per_split[split], len(cand)))]
+    recs = s2_batch([f"arXiv:{m['id']}" for _, m in picked],
+                    "references.paperId,references.title,references.abstract,references.publicationDate,"
+                    "citations.publicationDate,citations.authors", chunk=20)
+    llm = extractor()
+    ok = [(s_, m) for s_, m in picked if recs.get(f"arXiv:{m['id']}")]
+    qs = rq_many(llm, [m for _, m in ok])
+    fas = facets_many(llm, qs)
+    rows = []
+    for (split, m), q, fa in zip(ok, qs, fas):
+        x = recs[f"arXiv:{m['id']}"]
+        d1 = (datetime.date.fromisoformat(m["date"]) + datetime.timedelta(days=365)).isoformat()
+        own = _surnames(m["authors"])
+        up = 0
+        for c in x.get("citations") or []:
+            pd = c.get("publicationDate")
+            if not pd or not (m["date"] <= pd <= d1):
                 continue
-            q = extract_rq(llm, m["title"], m["abstract"])
-            try:
-                refs = s2_references(m["id"])
-            except Exception:
-                refs = []
-            R = [{"title": r["title"], "abstract": r["abstract"], "date": r["publicationDate"]} for r in refs
-                 if r.get("abstract") and r.get("publicationDate") and r["publicationDate"] < m["date"]][:30]
-            ref_ids = [r.get("externalIds", {}).get("CorpusId") for r in refs if r.get("externalIds")]
-            rows.append({"id": m["id"], "split": split, "t": m["date"], "q": q, "facets": extract_facets(llm, q),
-                         "title": m["title"], "abstract": m["abstract"], "n_authors": len(m["authors"]),
-                         "R": R, "ref_ids": [x for x in ref_ids if x], "uptake12": u,
-                         "log_uptake": float(np.log1p(u))})
+            names = {a.get("name", "").split()[-1].lower() for a in c.get("authors", []) if a.get("name")}
+            if not names & own:
+                up += 1
+        refs = x.get("references") or []
+        R = [{"title": r["title"], "abstract": r["abstract"], "date": r["publicationDate"]} for r in refs
+             if r.get("abstract") and r.get("publicationDate") and r["publicationDate"] < m["date"]][:30]
+        rows.append({"id": m["id"], "split": split, "t": m["date"], "q": q, "facets": fa, "title": m["title"],
+                     "abstract": m["abstract"], "n_authors": len(m["authors"]), "R": R,
+                     "r_source": "references" if len(R) >= 5 else "few_references",
+                     "ref_ids": [r["paperId"] for r in refs if r.get("paperId")], "uptake12": up,
+                     "log_uptake": float(np.log1p(up))})
     write_jsonl(HERE / "items_uptake.jsonl", rows)
+    print(len(rows), "uptake items")
 
 
 def build_groups(min_shared=3):

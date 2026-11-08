@@ -59,11 +59,12 @@ def cmd_pools():
 
 def cmd_claims(limit=None):
     """limit: focal papers per field (CPU budget; the paper asks for 100 -- deviation in NOTEBOOK.md)."""
+    from common.extract import claims_many
     llm = extractor()
     for F in FIELDS:
         rows = read_jsonl(HERE / "pools" / f"{F}_focal.jsonl")[:limit]
-        for r in rows:
-            r["claims"] = extract_claims(llm, r["title"], r["abstract"])
+        for r, c in zip(rows, claims_many(llm, rows)):
+            r["claims"] = c
         rows = [r for r in rows if len(r["claims"]) >= 4]
         write_jsonl(HERE / "focal" / f"{F}.jsonl", rows)
         print(F, len(rows), "focal papers with >= 4 claims")
@@ -141,6 +142,9 @@ def cmd_axioms(limit=None):
     pools = {F: read_jsonl(HERE / "pools" / f"{F}_pool.jsonl") for F in FIELDS}
     older = {F: read_jsonl(HERE / "pools" / f"{F}_older.jsonl") for F in FIELDS}
     raw = []
+    # batch all paraphrased copies first (cache), then the loop below reads them
+    para_llm.batch([PARAPHRASE.format(text=f"{f['title']}. {f['abstract']}") for F in FIELDS
+                    for f in read_jsonl(HERE / "focal" / f"{F}.jsonl")[:limit]], max_new_tokens=500)
     for F in FIELDS:
         foc = read_jsonl(HERE / "focal" / f"{F}.jsonl")[:limit]
         for f in foc:
@@ -194,6 +198,9 @@ def cmd_human():
     cand = load_arxiv(categories=("cs.LG", "cs.CL", "cs.CV", "cs.AI"), start="2024-01-01", end=T_NJB)
     pool = random.Random(0).sample(cand, min(n_pool, len(cand)))
     scores = {m: [] for m in MEASURES}
+    if llm:
+        from common.extract import claims_many
+        claims_many(llm, test)  # batch-fill the cache
     for r in test:
         claims = (extract_claims(llm, r["title"], r["abstract"]) if llm
                   else novelty.sentences(r["abstract"])[:10])

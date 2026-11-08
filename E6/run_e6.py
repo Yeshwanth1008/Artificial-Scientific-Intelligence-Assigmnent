@@ -40,49 +40,63 @@ def gen_llm():
 
 # ------------------------------------------------------------------ testbeds
 
-def cmd_build_lit(n_sets=120, min_refs=10, max_refs=15):
-    """Targets: arXiv cs.LG/cs.CL papers posted 2025-03..2025-12 with >= 10 references that have abstracts."""
-    from common.data_sources import load_arxiv, s2_references
+def cmd_build_lit(n_sets=120, min_refs=10, max_refs=15, n_cand=400):
+    """Targets: arXiv cs.LG/cs.CL papers posted 2025-03..2025-12 (after the generator's assumed cutoff) with >= 10
+    references that have abstracts and are dated before the target. References come from the Semantic Scholar
+    batch endpoint (no key needed); the newest max_refs references form the input set."""
+    from common.data_sources import load_arxiv, s2_batch
+    from common.extract import rq_many
     from common.prompts import EXTRACT_HYP
     rng = random.Random(0)
-    cands = [p for p in load_arxiv(("cs.LG", "cs.CL"), "2025-03-01", "2025-12-31")]
+    cands = load_arxiv(("cs.LG", "cs.CL"), "2025-03-01", "2025-12-31")
     rng.shuffle(cands)
-    llm = extractor()
-    sets = []
+    cands = cands[:n_cand]
+    recs = s2_batch([f"arXiv:{p['id']}" for p in cands], "references.paperId,references.publicationDate", chunk=50)
+    ref_ids = sorted({r["paperId"] for x in recs.values() if x for r in (x.get("references") or []) if r.get("paperId")})
+    meta = s2_batch(ref_ids, "title,abstract,publicationDate", chunk=400)
+    sets, keep = [], []
     for p in cands:
-        try:
-            refs = s2_references(p["id"])
-        except Exception:
+        x = recs.get(f"arXiv:{p['id']}")
+        if not x:
             continue
-        refs = [r for r in refs if r.get("abstract") and r.get("publicationDate") and r["publicationDate"] < p["date"]]
+        refs = [meta.get(r["paperId"]) for r in (x.get("references") or []) if r.get("paperId")]
+        refs = [r for r in refs if r and r.get("abstract") and r.get("publicationDate") and r["publicationDate"] < p["date"]]
         if len(refs) < min_refs:
             continue
-        refs = sorted(refs, key=lambda r: r["publicationDate"], reverse=True)[:max_refs]  # newest refs
-        hyp = llm(EXTRACT_HYP.format(title=p["title"], abstract=p["abstract"]), max_new_tokens=80)["text"].split("\n")[0]
-        sets.append({"input_set_id": f"lit:{p['id']}", "testbed": "literature", "t": p["date"],
-                     "target_rq": extract_rq(llm, p["title"], p["abstract"]), "target_hyp": hyp,
-                     "inputs": [{"title": r["title"], "abstract": r["abstract"], "date": r["publicationDate"]}
-                                for r in refs], "hand_checked": False})
-        if len(sets) >= n_sets:
+        refs = sorted(refs, key=lambda r: r["publicationDate"], reverse=True)[:max_refs]  # newest references
+        keep.append((p, refs))
+        if len(keep) >= n_sets:
             break
+    llm = extractor()
+    papers = [p for p, _ in keep]
+    rqs = rq_many(llm, papers)
+    hyp_prompts = [EXTRACT_HYP.format(title=p["title"], abstract=p["abstract"]) for p in papers]
+    hyps = [o["text"].splitlines()[0] if o["text"] else "" for o in llm.batch(hyp_prompts, max_new_tokens=80)]
+    for (p, refs), rq, hyp in zip(keep, rqs, hyps):
+        sets.append({"input_set_id": f"lit:{p['id']}", "testbed": "literature", "t": p["date"], "target_title": p["title"],
+                     "target_rq": rq, "target_hyp": hyp,
+                     "inputs": [{"title": r["title"], "abstract": r["abstract"], "date": r["publicationDate"]} for r in refs],
+                     "hand_checked": False})
     write_jsonl(HERE / "testbed_literature.jsonl", sets)
     print(len(sets), "literature input sets; hand-check 20 targets and set hand_checked=true")
 
 
-def cmd_build_data(n_examples=20):
+def cmd_build_data(n_examples=20, sets_per_task=5):
     """HypoBench layout expected (download from the HypoBench release, Appendix B):
     data/hypobench/<task>/train.jsonl, test.jsonl with {"text", "label"}; optional planted.txt for
     synthetic tasks. The 'input papers' of a data input set are n_examples labelled training examples."""
     sets = []
     for task in sorted((ROOT / "data" / "hypobench").glob("*")):
+        if not (task / "train.jsonl").exists() or not (task / "test.jsonl").exists():
+            continue
         tr = read_jsonl(task / "train.jsonl")
-        rng = random.Random(0)
-        ex = rng.sample(tr, min(n_examples, len(tr)))
         planted = (task / "planted.txt").read_text().strip() if (task / "planted.txt").exists() else None
-        sets.append({"input_set_id": f"data:{task.name}", "testbed": "data", "t": None, "task": task.name,
-                     "planted": planted, "labels": sorted({str(r["label"]) for r in tr}),
-                     "inputs": [{"title": f"Example {i + 1} (label: {r['label']})", "abstract": r["text"]}
-                                for i, r in enumerate(ex)]})
+        for k in range(sets_per_task):  # several input sets per task: different training examples (seed k)
+            ex = random.Random(k).sample(tr, min(n_examples, len(tr)))
+            sets.append({"input_set_id": f"data:{task.name}:{k}", "testbed": "data", "t": None, "task": task.name,
+                         "planted": planted, "labels": sorted({str(r["label"]) for r in tr}),
+                         "inputs": [{"title": f"Example {i + 1} (label: {r['label']})", "abstract": r["text"]}
+                                    for i, r in enumerate(ex)]})
     write_jsonl(HERE / "testbed_data.jsonl", sets)
     print(len(sets), "data input sets")
 
@@ -121,6 +135,9 @@ def _hyps_for_questions(llm, inputs, qs, b):
     out = []
     per = K // len(qs)
     for q in qs:
+        if not q:  # no question -> no hypotheses (counted as failures in the evaluation)
+            out += [(None, "")] * per
+            continue
         hs = parse_prefixed(b.call(llm, P.E6_HYP_FOR_Q.format(papers=papers_block(inputs), q=q, n=per), 250), "H:")
         out += [(q, h) for h in _fill(hs, per)]
     return out
@@ -192,24 +209,30 @@ def run_arm(arm, s, all_sets, rng):
     return pairs, b.used
 
 
-def cmd_generate():
+def _generate(dry):
     out = HERE / "generations.jsonl"
-    done = {(r["input_set_id"], r["arm"]) for r in read_jsonl(out)} if out.exists() else set()
+    rows = []
     for tb in ("literature", "data"):
         f = HERE / f"testbed_{tb}.jsonl"
         if not f.exists():
             print("missing", f); continue
         sets = read_jsonl(f)
-        rng = random.Random(SEED)
+        rng = random.Random(SEED)  # same shuffled-input draws in every pass
         for s in sets:
             for arm in ARMS:
-                if (s["input_set_id"], arm) in done:
-                    continue
                 pairs, used = run_arm(arm, s, sets, rng)
-                for q, h in pairs:
-                    append_jsonl(out, {"input_set_id": s["input_set_id"], "testbed": tb, "arm": arm, "rq": q,
-                                       "hypothesis": h, "tokens_generated": used,
-                                       "model": gen_llm().model, "seed": SEED})
+                rows += [{"input_set_id": s["input_set_id"], "testbed": tb, "arm": arm, "rq": q, "hypothesis": h,
+                          "tokens_generated": used, "model": gen_llm().model, "seed": SEED} for q, h in pairs]
+    if not dry:
+        write_jsonl(out, rows)
+        print(len(rows), "generations")
+
+
+def cmd_generate():
+    """All arms on both testbeds. Multi-step arms are pre-filled in batches (collect mode) and then run for real,
+    which gives exactly the outputs a sequential run would give from the same cache."""
+    from common.llm import run_with_prefill
+    run_with_prefill(_generate)
 
 
 # ------------------------------------------------------------------ evaluation
@@ -264,6 +287,11 @@ def already_asked(qs, t, index, k=5, cos_thr=0.75):
 
 
 def cmd_evaluate():
+    from common.llm import run_with_prefill
+    run_with_prefill(_evaluate)
+
+
+def _evaluate(dry):
     from common.diversity import diversity
     from common.rerank import same_question_scores
     gens = read_jsonl(HERE / "generations.jsonl")
@@ -306,8 +334,10 @@ def cmd_evaluate():
         types = [q_type(q) for q in qs]
         r["qtype"] = {t: types.count(t) / len(types) for t in set(types)} if types else {}
         rows.append(r)
-    write_jsonl(HERE / "results" / "per_set.jsonl", rows)
     rows += judge_rows(by, sets)
+    if dry:
+        return
+    write_jsonl(HERE / "results" / "per_set.jsonl", rows)
     summarise(rows)
 
 

@@ -119,6 +119,38 @@ def s2_get(path, params=None, retries=6):
     raise RuntimeError(f"S2 failed: {path}")
 
 
+def s2_batch(ids, fields, chunk=100, cache_name="s2_batch"):
+    """POST /paper/batch for many ids (e.g. 'arXiv:2503.17882', a paperId). Works without a key, with back-off.
+    Results are cached per (id, fields). Returns {id: record or None}."""
+    import hashlib
+    cdir = DATA / cache_name
+    cdir.mkdir(parents=True, exist_ok=True)
+    fkey = hashlib.md5(fields.encode()).hexdigest()[:8]
+    path = lambda i: cdir / f"{fkey}_{hashlib.md5(i.encode()).hexdigest()}.json"
+    out = {}
+    todo = []
+    for i in ids:
+        if path(i).exists():
+            out[i] = json.loads(path(i).read_text(encoding="utf-8"))
+        else:
+            todo.append(i)
+    h = {"x-api-key": os.environ["S2_API_KEY"]} if os.environ.get("S2_API_KEY") else {}
+    for k in range(0, len(todo), chunk):
+        part = todo[k:k + chunk]
+        for attempt in range(10):
+            r = requests.post(f"{S2}/paper/batch", params={"fields": fields}, json={"ids": part}, headers=h, timeout=120)
+            if r.status_code == 200:
+                break
+            time.sleep(min(60, 2 ** attempt))
+        else:
+            raise RuntimeError(f"S2 batch failed ({r.status_code})")
+        for i, rec in zip(part, r.json()):
+            out[i] = rec
+            path(i).write_text(json.dumps(rec), encoding="utf-8")
+        time.sleep(1.1)
+    return out
+
+
 def s2_references(arxiv_id, fields="title,abstract,publicationDate,externalIds,authors"):
     cache = DATA / "s2_refs" / f"{arxiv_id.replace('/', '_')}.json"
     if cache.exists():

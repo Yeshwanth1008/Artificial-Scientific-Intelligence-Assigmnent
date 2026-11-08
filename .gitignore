@@ -11,3 +11,8 @@ data/novelty_judge_bench.jsonl
 E2/pools/
 E2/focal/
 E4/cards.jsonl.bak
+data/hypobench/
+E6/testbed_*.jsonl
+main/items_*.jsonl
+main/o2_pairs.jsonl
+E1/workbook.html

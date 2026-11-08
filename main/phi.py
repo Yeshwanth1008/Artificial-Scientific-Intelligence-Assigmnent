@@ -102,8 +102,8 @@ class PhiModel:
         facet_claims = [f"{k}: {phi['facets'].get(k, '')}" for k in FACET_KEYS if phi["facets"].get(k)]
         import sys
         sys.path.insert(0, str(HERE.parent / "E2"))
-        import novelty as nv
-        papers = [{"id": n["id"], "date": n["date"], "title": n["title"], "abstract": n["abstract"]} for n in nn[:20]]
+        import novelty as nv  # the 5 nearest earlier papers, sentence level (cost: ~35 sentences per question)
+        papers = [{"id": n["id"], "date": n["date"], "title": n["title"], "abstract": n["abstract"]} for n in nn[:5]]
         fac = nv.score_papers(phi["q"], facet_claims or [phi["q"]], papers, t)["yours"]
         return np.array([nearest, density, offspan, fac], dtype=float)
 

@@ -45,7 +45,8 @@ class Embedder:
     def __call__(self, texts):
         texts = list(texts)
         keys = [text_key(("P|" if self.use_prompt else "") + t) for t in texts]
-        missing = [i for i, k in enumerate(keys) if k not in self._mem and not (self.cache_dir / f"{k}.npy").exists()]
+        disk = os.environ.get("EMB_DISK_CACHE", "1") == "1"   # 0 on Kaggle: keep 10^5+ sentence vectors in memory
+        missing = [i for i, k in enumerate(keys) if k not in self._mem and not (disk and (self.cache_dir / f"{k}.npy").exists())]
         if missing:
             model = _load(self.name)
             todo = [texts[i] for i in missing]
@@ -55,7 +56,8 @@ class Embedder:
             for i, v in zip(missing, vecs):
                 v = v.astype(np.float32)
                 self._mem[keys[i]] = v
-                np.save(self.cache_dir / f"{keys[i]}.npy", v)
+                if disk:
+                    np.save(self.cache_dir / f"{keys[i]}.npy", v)
         out = []
         for k in keys:
             if k not in self._mem:
