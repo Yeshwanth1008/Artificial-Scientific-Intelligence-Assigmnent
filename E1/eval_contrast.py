@@ -182,6 +182,8 @@ def main():
     ap.add_argument("--file", default=str(HERE / "contrast.jsonl"))
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--models", default="qwen3-0.6b,specter2,mpnet,bge-small")
+    ap.add_argument("--part", default=None, help="run one part in its own process: an embedder name, 'cross' or 'dedup'")
+    ap.add_argument("--merge", action="store_true", help="merge the per-part files into results.json")
     a = ap.parse_args()
     items = [it for it in read_jsonl(a.file) if it["id"] != "h000"]  # h000 = the paper's example
     errs, cnt, nlf = check(items)
@@ -190,6 +192,30 @@ def main():
         print("  -", e)
     if a.check:
         sys.exit(1 if errs else 0)
+    parts = HERE / "results_parts"
+    if a.part:  # one model per process (several models in one process crash torch on some Windows machines)
+        parts.mkdir(exist_ok=True)
+        if a.part == "cross":
+            out = metrics(items, cross_distances(items))
+        elif a.part == "dedup":
+            out = dedup(items)
+        else:
+            dist, spec = embed_distances(items, a.part)
+            out = metrics(items, dist, spec)
+        write_json(parts / f"{a.part}.json", out)
+        print(a.part, "done")
+        return
+    if a.merge:
+        from common.io import read_json
+        res = {"n_items": len(items), "constraint_errors": errs, "models": {}}
+        for m in a.models.split(","):
+            res["models"][m] = read_json(parts / f"{m}.json")
+        res["models"]["cross-encoder:qwen3-reranker-0.6b"] = read_json(parts / "cross.json")
+        res["length_only_scope_baseline"] = length_baseline(items)
+        res["dedup"] = read_json(parts / "dedup.json")
+        write_json(HERE / "results.json", res)
+        print("merged")
+        return
     res = {"n_items": len(items), "constraint_errors": errs, "models": {}}
     for m in a.models.split(","):
         dist, spec = embed_distances(items, m)

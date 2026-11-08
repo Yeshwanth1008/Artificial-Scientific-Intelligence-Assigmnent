@@ -28,7 +28,7 @@ PREFIX = ("<|im_start|>system\nJudge whether the Document meets the requirements
 SUFFIX = "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
 
 
-def same_question_scores(pairs, instruction=SAME_QUESTION_INSTRUCTION, batch_size=16, symmetric=True):
+def same_question_scores(pairs, instruction=SAME_QUESTION_INSTRUCTION, batch_size=8, symmetric=True):
     """pairs: list of (q1, q2). Returns P(same) per pair; symmetric=True averages both orders."""
     import torch
     m = _load()
@@ -38,9 +38,9 @@ def same_question_scores(pairs, instruction=SAME_QUESTION_INSTRUCTION, batch_siz
         for i in range(0, len(ps), batch_size):
             texts = [PREFIX + f"<Instruct>: {instruction}\n<Query>: {a}\n<Document>: {b}" + SUFFIX
                      for a, b in ps[i:i + batch_size]]
-            enc = m["t"](texts, padding=True, truncation=True, max_length=1024, return_tensors="pt").to(m["dev"])
-            with torch.no_grad():
-                logits = m["m"](**enc).logits[:, -1, :]
+            enc = m["t"](texts, padding=True, truncation=True, max_length=512, return_tensors="pt").to(m["dev"])
+            with torch.no_grad():  # only the last position is needed (left padding): avoid a full-vocab logit tensor
+                logits = m["m"](**enc, logits_to_keep=1).logits[:, -1, :]
             two = torch.stack([logits[:, m["no"]], logits[:, m["yes"]]], 1).float()
             out += torch.softmax(two, 1)[:, 1].cpu().tolist()
         return np.array(out)
