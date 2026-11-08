@@ -95,3 +95,11 @@ Deviations go in the **Deviations** section at the end, dated, and earlier text 
 
 ## Deviations
 (none yet)
+
+### Addendum 2026-11-08: E1 test set (before any E1 evaluation)
+* `E1/contrast.jsonl`: n = 60 items (h001-h060), sha256 of ids `113d813578e17fe9cd42a5d26816b20b67642e1714f0bbb36e0fd00b849da3aa`.
+* **Deviation:** the items were written by Claude (an AI assistant), not by hand, at the student's request; this is
+  declared in AI_LOG.md and NOTEBOOK.md. This makes E1 partly circular (a language model wrote the items used to
+  test language models), so E1 results are reported with that caveat and are not presented as a hand-made test.
+* The 24-hour re-check was not done by a human. No second reader.
+* Predictions in the E1 section above are unchanged.

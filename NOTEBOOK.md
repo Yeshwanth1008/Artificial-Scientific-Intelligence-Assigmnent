@@ -44,3 +44,6 @@ Dated log of decisions. Every abandoned idea gets one line saying why it was dro
 * 2026-11-08 — Noted for E2 Task 3: novelty-judge-bench labels are built from accepted top-decile vs rejected
   bottom-decile papers, which is exactly the novelty/quality confound of T2 C.3. Prediction: the quality-only baseline
   will score a high AUROC.
+* 2026-11-08 — **Deviation (E1):** the 60 E1 items (h001–h060) were written by Claude, not by hand, at my request,
+  and this is declared to the organisers. Consequence: the test is partly circular, and the human 24-hour re-check
+  and second reader were not done. Every E1 result is reported with this caveat.
