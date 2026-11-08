@@ -1,0 +1,12 @@
+{
+  "n_iclr":   {"train": 3000, "select": 1500, "test": 3000},
+  "n_uptake": {"train": 3000, "select": 1000, "test": 1500},
+  "encoder": "Qwen/Qwen3-Embedding-0.6B",
+  "cross_encoder": "Qwen/Qwen3-Reranker-0.6B",
+  "llm": "Qwen/Qwen2.5-1.5B-Instruct",
+  "llm_training_cutoff_assumed": "2024-12-31",
+  "margin_beats": 0.0,
+  "t1_tolerance": 0.02,
+  "same_question_threshold": 0.5,
+  "seed": 0
+}

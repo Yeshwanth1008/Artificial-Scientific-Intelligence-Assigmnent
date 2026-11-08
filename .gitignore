@@ -1,0 +1,13 @@
+data/cache/
+__pycache__/
+*.pyc
+*.pkl
+*.npy
+theory/*.html
+.ipynb_checkpoints/
+
+# copies of third-party data (rule R7): only manifests / derived scores are committed
+data/novelty_judge_bench.jsonl
+E2/pools/
+E2/focal/
+E4/cards.jsonl.bak

@@ -1,0 +1,9 @@
+{
+  "rating": {
+    "ceiling": 0.6494300259927378,
+    "sd_over_splits": 0.005163379154745219,
+    "n_papers": 19471,
+    "gap": 1.0,
+    "key": "rating"
+  }
+}

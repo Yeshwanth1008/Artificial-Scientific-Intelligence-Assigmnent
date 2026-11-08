@@ -1,0 +1,10 @@
+numpy>=1.26
+scipy>=1.11
+scikit-learn>=1.4
+torch>=2.3
+transformers>=4.51
+sentence-transformers>=3.0
+requests>=2.31
+openreview-py>=1.40
+markdown>=3.5
+matplotlib>=3.8
