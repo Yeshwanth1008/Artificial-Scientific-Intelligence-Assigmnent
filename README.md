@@ -9,6 +9,18 @@ language model (Qwen2.5-1.5B-Instruct), run on a free Kaggle T4 (16 GB). No paid
 Every claim that rests on the language model is tested on papers or reviews dated after it: E4 tests on ICLR 2026, E6
 on papers from March 2025, and M on items from July 2025.
 
+## Status at submission
+| Part | Status |
+|---|---|
+| Theory T1–T5 | complete: `theory/working.pdf`, `theory/answer_sheets.pdf`; all numbers verified by script |
+| E1 | checker and evaluation implemented; hand-writing workbook of 75 real 2025 papers built; items not finished |
+| E2 | measures, manipulations and real arXiv pools built; claim extraction not finished on CPU, so no pass rates yet |
+| E4 | **Task 1 run on real data** (ceiling 0.649 on ICLR 2026); Task 2 abstract view run on real data (see `E4/results/`) |
+| E6 | implemented, not run (compute); see `E6/memo.md` |
+| Main Problem | Φ, readouts, baselines and battery implemented and smoke-tested; battery not run (compute); see `main/REPORT.md` |
+
+No number in this repository is simulated. Every test that was not run is listed with its reason.
+
 ## Layout
 ```
 theory/      working.pdf, answer_sheets.pdf (+ Markdown sources, check_numbers.py, make_pdf.py)

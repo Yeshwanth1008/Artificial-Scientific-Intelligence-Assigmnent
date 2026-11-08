@@ -4,15 +4,15 @@ Every substantive use of an AI assistant (rule R1), with what I checked.
 
 ## Uses
 
-| Date | Tool | Used for | How I checked it |
-|---|---|---|---|
-| Oct–Nov 2026 | `<name the other AI>` | First draft of the Theory answers (answer sheets and working for T1–T5) | Re-derived every number with a script; read every proof; found 3 errors (below) |
-| 7 Nov 2026 | Claude Code (Claude Opus 5.5) | Reading the paper with me and planning: choosing E1/E2/E4 (+E6) and the repo layout | Checked that the three experiments cover the core tests of the Main Problem battery (I1, S1, A1, H3, O1) |
-| 7 Nov 2026 | Claude Code | Corrected and rewrote the Theory answers; wrote `theory/check_numbers.py` and the PDF build | All 32 numerical answers pass the script; read both PDFs |
-| 7 Nov 2026 | Claude Code | Wrote the code: shared library (`common/`), E1 checker and evaluation, E2 novelty measures and pool manipulations, E4 evaluation kit, E6 pipeline arms, and the Main Problem (Φ, readouts, baselines, test battery, runner) | Smoke tests on toy data: E1 checker on the paper's example; E2 time cut-off, concentration and copy on toy pools; E4 kit on synthetic reviews; Φ end to end on a toy index |
-| 7–8 Nov 2026 | Claude Code | Drafted README, NOTEBOOK and PREREG, including the predictions | I read and accepted the predictions before committing. The E4 ceiling prediction was removed because the ceiling had already been computed |
-| 8 Nov 2026 | Claude Code | Found public data mirrors (ICLR 2024–2026 reviews, novelty-judge-bench, arXiv snapshot), wrote `data/convert_hf.py`, measured CPU speed, ran the E4 ceiling and the preparation steps | Sources are listed in `convert_hf.py`; every deviation (rating instead of contribution, topic clusters, smaller local samples) is in NOTEBOOK.md |
-| 8 Nov 2026 | Claude Code + fixed prompt `EXTRACT_RQ` | E1 workbook: selected 75 real 2025 arXiv papers and extracted question A with the one fixed prompt | I edit every A by hand. B, B_min, C, C_tilde, narrower and broader are written by hand, without AI |
+| Tool | Used for | How I checked it |
+|---|---|---|
+| `<name the other AI>` | First draft of the Theory answers (answer sheets and working for T1–T5) | Re-derived every number with a script; read every proof; found 3 errors (below) |
+| Claude Code (Claude Opus 5.5) | Reading the paper with me and planning: choosing E1/E2/E4 (+E6) and the repo layout | Checked that the three experiments cover the core tests of the Main Problem battery (I1, S1, A1, H3, O1) |
+| Claude Code | Corrected and rewrote the Theory answers; wrote `theory/check_numbers.py` and the PDF build | All 32 numerical answers pass the script; read both PDFs |
+| Claude Code | Wrote the code: shared library (`common/`), E1 checker and evaluation, E2 novelty measures and pool manipulations, E4 evaluation kit, E6 pipeline arms, and the Main Problem (Φ, readouts, baselines, test battery, runner) | Smoke tests on toy data: E1 checker on the paper's example; E2 time cut-off, concentration and copy on toy pools; E4 kit on synthetic reviews; Φ end to end on a toy index |
+| Claude Code | Drafted README, NOTEBOOK and PREREG, including the predictions | I read and accepted the predictions before committing. The E4 ceiling prediction was removed because the ceiling had already been computed |
+| Claude Code | Found public data mirrors (ICLR 2024–2026 reviews, novelty-judge-bench, arXiv snapshot), wrote `data/convert_hf.py`, measured CPU speed, ran the E4 ceiling and the preparation steps | Sources are listed in `convert_hf.py`; every deviation (rating instead of contribution, topic clusters, smaller local samples) is in NOTEBOOK.md |
+| Claude Code + fixed prompt `EXTRACT_RQ` | E1 workbook: selected 75 real 2025 arXiv papers and extracted question A with the one fixed prompt | I edit every A by hand. B, B_min, C, C_tilde, narrower and broader are written by hand, without AI |
 
 ## AI errors caught
 1. **T5 B.1 (other AI).** The "far" question was given prior π = 0.99 ("settled"), but the reports were about
