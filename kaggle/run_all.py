@@ -255,6 +255,8 @@ def push():
         return
     url = subprocess.run(f"git -C {ROOT} remote get-url origin", shell=True, capture_output=True, text=True).stdout.strip()
     url = url.split("@")[-1].replace("https://", "")
+    # others may have pushed meanwhile: rebase local commits (author dates are kept) before pushing
+    subprocess.run(f"git -C {ROOT} pull --rebase -q https://x-access-token:{tok}@{url} main", shell=True)
     r = subprocess.run(f"git -C {ROOT} push https://x-access-token:{tok}@{url} HEAD:main", shell=True,
                        capture_output=True, text=True)
     log("pushed to GitHub" if r.returncode == 0 else
