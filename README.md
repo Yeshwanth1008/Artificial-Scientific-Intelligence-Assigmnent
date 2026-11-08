@@ -3,8 +3,8 @@
 Submission repository: Theory (T1–T5), Experiments E1, E2, E4 and E6, and the Main Problem M.
 
 **Compute tier: small.** One encoder (Qwen3-Embedding-0.6B), one cross-encoder (Qwen3-Reranker-0.6B) and one
-language model (Qwen2.5-1.5B-Instruct), run on a free Kaggle T4 (16 GB). No paid API was used; if
-`LLM_BACKEND=api` is ever set, that run is declared in NOTEBOOK.md.
+language model (Qwen2.5-1.5B-Instruct; 0.5B in the local runs). Everything reported here ran on a CPU-only laptop
+(designed for one free T4 GPU). No paid API was used.
 **Assumed LM training cutoff:** 2024-12-31. Qwen2.5 was released in September 2024; we take a later date to be safe.
 Every claim that rests on the language model is tested on papers or reviews dated after it: E4 tests on ICLR 2026, E6
 on papers from March 2025, and M on items from July 2025.
