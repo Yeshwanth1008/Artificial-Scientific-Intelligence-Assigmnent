@@ -1,0 +1,798 @@
+{
+  "n_items": 60,
+  "constraint_errors": [],
+  "models": {
+    "qwen3-0.6b": {
+      "near_miss_error": {
+        "overall": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "overlap_shortcut": {
+        "overall": {
+          "est": 0.31666666666666665,
+          "lo": 0.2,
+          "hi": 0.43333333333333335,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.4166666666666667,
+          "lo": 0.16666666666666666,
+          "hi": 0.6666666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.25,
+          "lo": 0.0,
+          "hi": 0.5,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.08333333333333333,
+          "lo": 0.0,
+          "hi": 0.25,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.5833333333333334,
+          "lo": 0.25,
+          "hi": 0.8333333333333334,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.25,
+          "lo": 0.0,
+          "hi": 0.5,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "low_overlap_shortcut": {
+        "overall": {
+          "est": 0.21666666666666667,
+          "lo": 0.11666666666666667,
+          "hi": 0.3333333333333333,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.25,
+          "lo": 0.0,
+          "hi": 0.5,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.16666666666666666,
+          "lo": 0.0,
+          "hi": 0.4166666666666667,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.5833333333333334,
+          "lo": 0.3333333333333333,
+          "hi": 0.8333333333333334,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.08333333333333333,
+          "lo": 0.0,
+          "hi": 0.25,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "scope_order": {
+        "overall": {
+          "est": 0.48333333333333334,
+          "lo": 0.35,
+          "hi": 0.6166666666666667,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "length_flipped": {
+          "est": 0.5833333333333334,
+          "lo": 0.3333333333333333,
+          "hi": 0.8333333333333334,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "not_flipped": {
+          "est": 0.4583333333333333,
+          "lo": 0.3125,
+          "hi": 0.6041666666666666,
+          "n": 48,
+          "n_clusters": 48
+        }
+      }
+    },
+    "specter2": {
+      "near_miss_error": {
+        "overall": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "overlap_shortcut": {
+        "overall": {
+          "est": 0.5166666666666667,
+          "lo": 0.38333333333333336,
+          "hi": 0.65,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.5,
+          "lo": 0.25,
+          "hi": 0.75,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.6666666666666666,
+          "lo": 0.4166666666666667,
+          "hi": 0.9166666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.08333333333333333,
+          "lo": 0.0,
+          "hi": 0.25,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.6666666666666666,
+          "lo": 0.4166666666666667,
+          "hi": 0.9166666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.6666666666666666,
+          "lo": 0.4166666666666667,
+          "hi": 0.9166666666666666,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "low_overlap_shortcut": {
+        "overall": {
+          "est": 0.4666666666666667,
+          "lo": 0.35,
+          "hi": 0.5833333333333334,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.5833333333333334,
+          "lo": 0.3333333333333333,
+          "hi": 0.8333333333333334,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.4166666666666667,
+          "lo": 0.16666666666666666,
+          "hi": 0.6666666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.16666666666666666,
+          "lo": 0.0,
+          "hi": 0.4166666666666667,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.5833333333333334,
+          "lo": 0.3333333333333333,
+          "hi": 0.8333333333333334,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.5833333333333334,
+          "lo": 0.3333333333333333,
+          "hi": 0.8333333333333334,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "scope_order": {
+        "overall": {
+          "est": 0.4166666666666667,
+          "lo": 0.2833333333333333,
+          "hi": 0.55,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "length_flipped": {
+          "est": 0.25,
+          "lo": 0.0,
+          "hi": 0.5,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "not_flipped": {
+          "est": 0.4583333333333333,
+          "lo": 0.3333333333333333,
+          "hi": 0.5833333333333334,
+          "n": 48,
+          "n_clusters": 48
+        }
+      }
+    },
+    "mpnet": {
+      "near_miss_error": {
+        "overall": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "overlap_shortcut": {
+        "overall": {
+          "est": 0.35,
+          "lo": 0.23333333333333334,
+          "hi": 0.48333333333333334,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.4166666666666667,
+          "lo": 0.16666666666666666,
+          "hi": 0.6666666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.5,
+          "lo": 0.25,
+          "hi": 0.75,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.25,
+          "lo": 0.0,
+          "hi": 0.5,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.5833333333333334,
+          "lo": 0.3333333333333333,
+          "hi": 0.8333333333333334,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "low_overlap_shortcut": {
+        "overall": {
+          "est": 0.23333333333333334,
+          "lo": 0.13333333333333333,
+          "hi": 0.35,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.4166666666666667,
+          "lo": 0.16666666666666666,
+          "hi": 0.6666666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.4166666666666667,
+          "lo": 0.16666666666666666,
+          "hi": 0.6666666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.16666666666666666,
+          "lo": 0.0,
+          "hi": 0.4166666666666667,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.16666666666666666,
+          "lo": 0.0,
+          "hi": 0.4166666666666667,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "scope_order": {
+        "overall": {
+          "est": 0.35,
+          "lo": 0.23333333333333334,
+          "hi": 0.48333333333333334,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "length_flipped": {
+          "est": 0.4166666666666667,
+          "lo": 0.16666666666666666,
+          "hi": 0.6666666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "not_flipped": {
+          "est": 0.3333333333333333,
+          "lo": 0.20833333333333334,
+          "hi": 0.4583333333333333,
+          "n": 48,
+          "n_clusters": 48
+        }
+      }
+    },
+    "bge-small": {
+      "near_miss_error": {
+        "overall": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 1.0,
+          "lo": 1.0,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "overlap_shortcut": {
+        "overall": {
+          "est": 0.4666666666666667,
+          "lo": 0.35,
+          "hi": 0.5833333333333334,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.6666666666666666,
+          "lo": 0.4166666666666667,
+          "hi": 0.9166666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.5,
+          "lo": 0.25,
+          "hi": 0.75,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.08333333333333333,
+          "lo": 0.0,
+          "hi": 0.25,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.5,
+          "lo": 0.25,
+          "hi": 0.75,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.5833333333333334,
+          "lo": 0.3333333333333333,
+          "hi": 0.8333333333333334,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "low_overlap_shortcut": {
+        "overall": {
+          "est": 0.38333333333333336,
+          "lo": 0.26666666666666666,
+          "hi": 0.5,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.3333333333333333,
+          "lo": 0.08333333333333333,
+          "hi": 0.5833333333333334,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.5,
+          "lo": 0.25,
+          "hi": 0.75,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.25,
+          "lo": 0.0,
+          "hi": 0.5,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.6666666666666666,
+          "lo": 0.4166666666666667,
+          "hi": 0.9166666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.16666666666666666,
+          "lo": 0.0,
+          "hi": 0.4166666666666667,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "scope_order": {
+        "overall": {
+          "est": 0.18333333333333332,
+          "lo": 0.09958333333333336,
+          "hi": 0.2833333333333333,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "length_flipped": {
+          "est": 0.4166666666666667,
+          "lo": 0.16666666666666666,
+          "hi": 0.6666666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "not_flipped": {
+          "est": 0.125,
+          "lo": 0.041666666666666664,
+          "hi": 0.22916666666666666,
+          "n": 48,
+          "n_clusters": 48
+        }
+      }
+    },
+    "cross-encoder:qwen3-reranker-0.6b": {
+      "near_miss_error": {
+        "overall": {
+          "est": 0.48333333333333334,
+          "lo": 0.35,
+          "hi": 0.6,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.5833333333333334,
+          "lo": 0.25,
+          "hi": 0.8333333333333334,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.4166666666666667,
+          "lo": 0.16666666666666666,
+          "hi": 0.6666666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.9166666666666666,
+          "lo": 0.75,
+          "hi": 1.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.5,
+          "lo": 0.25,
+          "hi": 0.75,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "overlap_shortcut": {
+        "overall": {
+          "est": 0.016666666666666666,
+          "lo": 0.0,
+          "hi": 0.05,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.08333333333333333,
+          "lo": 0.0,
+          "hi": 0.25,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 12,
+          "n_clusters": 12
+        }
+      },
+      "low_overlap_shortcut": {
+        "overall": {
+          "est": 0.21666666666666667,
+          "lo": 0.11666666666666667,
+          "hi": 0.3333333333333333,
+          "n": 60,
+          "n_clusters": 60
+        },
+        "role_swap": {
+          "est": 0.16666666666666666,
+          "lo": 0.0,
+          "hi": 0.4166666666666667,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "constraint_flip": {
+          "est": 0.25,
+          "lo": 0.0,
+          "hi": 0.5,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "goal_swap": {
+          "est": 0.16666666666666666,
+          "lo": 0.0,
+          "hi": 0.4166666666666667,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "inquiry_change": {
+          "est": 0.4166666666666667,
+          "lo": 0.16666666666666666,
+          "hi": 0.6666666666666666,
+          "n": 12,
+          "n_clusters": 12
+        },
+        "direction_flip": {
+          "est": 0.08333333333333333,
+          "lo": 0.0,
+          "hi": 0.25,
+          "n": 12,
+          "n_clusters": 12
+        }
+      }
+    }
+  },
+  "length_only_scope_baseline": {
+    "overall": {
+      "est": 0.55,
+      "lo": 0.43333333333333335,
+      "hi": 0.667083333333331,
+      "n": 60,
+      "n_clusters": 60
+    },
+    "length_flipped": {
+      "est": 0.0,
+      "lo": 0.0,
+      "hi": 0.0,
+      "n": 12,
+      "n_clusters": 12
+    }
+  },
+  "dedup": {
+    "cross_encoder": {
+      "precision": 0.27790973871733965,
+      "recall": 0.975,
+      "false_accept_C_or_Ctilde": 0.9333333333333333
+    },
+    "cross_threshold": 0.5,
+    "best_cosine_hindsight": {
+      "threshold": 0.9309999942779541,
+      "precision": 0.5128205128205128,
+      "recall": 0.5,
+      "false_accept_C_or_Ctilde": 0.44166666666666665
+    }
+  }
+}

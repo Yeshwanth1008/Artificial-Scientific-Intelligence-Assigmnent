@@ -54,4 +54,23 @@ moves an embedding a lot. Flipping "with"/"without", "how"/"why" or "improve"/"h
    items.
 
 ## Task 4: deduplication
-DEDUP_TEXT
+All 420 texts were pooled. For each A, its 10 nearest texts (Qwen3-Embedding) were judged by the cross-encoder at
+the fixed threshold 0.5. The comparison is the best cosine threshold chosen *with hindsight* on the same data.
+
+| Decision rule | Precision | Recall (finds B and B_min) | Near-misses wrongly accepted (C, C̃) |
+|---|---|---|---|
+| Retrieve top-10, then cross-encoder ≥ 0.5 | 0.28 | **0.98** | **93 %** |
+| Best cosine threshold, chosen with hindsight (0.931) | 0.51 | 0.50 | 44 % |
+
+**Why they differ.** The cross-encoder *ranks* well (in Task 2 it scores the paraphrase above the near-miss on about
+half the items, and almost always above the minimal edit), but its *absolute* scores are badly calibrated. At 0.5
+it says "same question" to nearly every same-topic text, including 93 % of the near-misses. So recall is almost
+perfect and precision collapses. The hindsight cosine threshold looks more balanced only because it was tuned on the
+answers. Even so, it still accepts 44 % of the near-misses and misses half the true paraphrases, because cosine
+cannot separate them (Task 2: near-miss error 1.00).
+
+**Consequence for the Main Problem.** A fixed 0.5 cut on this cross-encoder is not a usable same-question decision.
+The threshold has to be calibrated on held-out labelled pairs. Better still, the decision should be *relative*:
+"is q′ closer to q than q's own paraphrases are?". The leader clustering in `common/diversity.py` and
+`PhiModel.same_question` should take a calibrated threshold, which is listed as a limitation in `main/REPORT.md`.
+
