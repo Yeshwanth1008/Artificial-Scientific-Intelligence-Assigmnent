@@ -68,9 +68,3 @@ Downloaded data and every model output are cached in `data/cache/`, which git ig
 | M Table 1 (core battery) | `python -m main.run test core` |
 | M Table 2 (extended battery) | `python -m main.run test extended` |
 | M timing | `python -m main.run timing` |
-
-## Order of work (and why)
-1. Theory, then E1 items (by hand), then E2/E4 (they produce the novelty and quality tools M reuses).
-2. Build M data. Run `python -m main.run select` freely on the 2024 selection year.
-3. Freeze every choice, run `hashes`, paste into PREREG.md and **commit PREREG.md**.
-4. Only then run `python -m main.run test core` / `extended`, once.
