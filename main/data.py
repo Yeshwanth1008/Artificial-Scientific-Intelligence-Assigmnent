@@ -59,6 +59,7 @@ class LitIndex:
             pool = model.start_multi_process_pool([f"cuda:{i}" for i in range(torch.cuda.device_count())])
             X = model.encode(texts, pool=pool, batch_size=256, normalize_embeddings=True, show_progress_bar=True)
             model.stop_multi_process_pool(pool)
+            model.to("cuda:0")  # the pool helper leaves the model on the CPU: move it back for all later encoding
         else:
             X = model.encode(texts, batch_size=256, normalize_embeddings=True, show_progress_bar=True)
         X = np.asarray(X).astype(np.float16)

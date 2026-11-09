@@ -28,7 +28,11 @@ def _load(name):
         dev = "cuda" if torch.cuda.is_available() else "cpu"
         kw = {"model_kwargs": {"torch_dtype": torch.float16}} if dev == "cuda" else {}
         _cache_models[name] = SentenceTransformer(MODELS.get(name, name), device=dev, **kw)
-    return _cache_models[name]
+    m = _cache_models[name]
+    import torch
+    if torch.cuda.is_available() and m.device.type != "cuda":  # never encode on the CPU when a GPU exists
+        m.to("cuda:0")
+    return m
 
 
 class Embedder:

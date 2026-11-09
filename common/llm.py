@@ -125,18 +125,31 @@ class LLM:
         return self._local_batch([prompt], mnt)[0]
 
     def _local_batch(self, prompts, mnt, bs=None):
-        """Batched generation; prompts are sorted by length so a batch carries little padding."""
+        """Batched generation. Prompts are sorted by length and packed into batches holding at most LLM_TOKENS
+        tokens (prompt + new tokens, summed over the batch) and at most LLM_BS prompts, so long prompts (E6: 15
+        abstracts) get small batches and short ones get large batches, without running out of GPU memory."""
         import torch
         tok, mdl = self._load_local()
-        bs = bs or int(os.environ.get("LLM_BS", "48" if torch.cuda.is_available() else "4"))
-        order = sorted(range(len(prompts)), key=lambda i: len(prompts[i]))
+        gpu = torch.cuda.is_available()
+        bs = bs or int(os.environ.get("LLM_BS", "64" if gpu else "4"))
+        budget = int(os.environ.get("LLM_TOKENS", "24000" if gpu else "4000"))
+        lens = [len(tok(p, add_special_tokens=False)["input_ids"]) + 30 for p in prompts]
+        order = sorted(range(len(prompts)), key=lambda i: lens[i])
+        batches, cur = [], []
+        for i in order:
+            if cur and (len(cur) >= bs or (len(cur) + 1) * (lens[i] + mnt) > budget):
+                batches.append(cur); cur = []
+            cur.append(i)
+        if cur:
+            batches.append(cur)
         res = [None] * len(prompts)
-        for i in range(0, len(order), bs):
-            idx = order[i:i + bs]
-            if len(order) > bs and i // bs % 20 == 0:
-                print(f"[llm] batch {i // bs + 1}/{(len(order) + bs - 1) // bs}", flush=True)
+        for b, idx in enumerate(batches):
+            if len(batches) > 1 and b % 20 == 0:
+                print(f"[llm] batch {b + 1}/{len(batches)} ({len(idx)} prompts)", flush=True)
             for j, o in zip(idx, self._gen_chunk(tok, mdl, [prompts[k] for k in idx], mnt)):
                 res[j] = o
+            if gpu:
+                torch.cuda.empty_cache()
         return res
 
     def _gen_chunk(self, tok, mdl, prompts, mnt):
