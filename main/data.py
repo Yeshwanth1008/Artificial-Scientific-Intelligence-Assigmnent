@@ -52,9 +52,16 @@ class LitIndex:
             rows = sorted(rng.sample(rows, max_papers), key=lambda r: r["date"])
         from common.embed import _load
         model = _load("qwen3-0.6b")       # encode directly: no per-text cache files for 10^5 papers
-        model.max_seq_length = 256         # title + first part of the abstract
-        X = model.encode([f"{r['title']}. {r['abstract']}" for r in rows], batch_size=128, normalize_embeddings=True,
-                         show_progress_bar=True, convert_to_numpy=True).astype(np.float16)
+        model.max_seq_length = 128         # title + first part of the abstract (compute-bound on a T4)
+        texts = [f"{r['title']}. {r['abstract']}" for r in rows]
+        import torch
+        if torch.cuda.device_count() > 1:  # both Kaggle T4s
+            pool = model.start_multi_process_pool([f"cuda:{i}" for i in range(torch.cuda.device_count())])
+            X = model.encode(texts, pool=pool, batch_size=256, normalize_embeddings=True, show_progress_bar=True)
+            model.stop_multi_process_pool(pool)
+        else:
+            X = model.encode(texts, batch_size=256, normalize_embeddings=True, show_progress_bar=True)
+        X = np.asarray(X).astype(np.float16)
         IDX.mkdir(parents=True, exist_ok=True)
         np.save(IDX / "X.npy", X)
         write_jsonl(IDX / "meta.jsonl", [{k: r[k] for k in ("id", "date", "title", "abstract", "authors")} for r in rows])

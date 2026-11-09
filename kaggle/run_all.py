@@ -35,8 +35,16 @@ HF = "https://huggingface.co/datasets"
 LOG = ROOT / "kaggle" / "run_log.md"
 
 
+T_START = time.time()
+BUDGET_H = float(os.environ.get("BUDGET_H", "9.5"))   # stop cleanly before Kaggle's 12 h limit so outputs are saved
+
+
+class OutOfTime(Exception):
+    pass
+
+
 def log(msg):
-    line = f"[{datetime.datetime.utcnow():%Y-%m-%d %H:%M} UTC] {msg}"
+    line = f"[{datetime.datetime.now(datetime.timezone.utc):%Y-%m-%d %H:%M} UTC] {msg}"
     print(line, flush=True)
     with open(LOG, "a", encoding="utf-8") as f:
         f.write(line + "\n")
@@ -53,6 +61,8 @@ def step(name):
             if (STEPS / f"{name}.done").exists():
                 print(f"-- skip {name} (done)")
                 return
+            if (time.time() - T_START) / 3600 > BUDGET_H:
+                raise OutOfTime(name)
             t0 = time.time()
             log(f"start {name}")
             fn()
@@ -71,6 +81,20 @@ def in_dir(d, fn, *a):
         return fn(*a)
     finally:
         os.chdir(old)
+
+
+# ======================================================================= restore
+
+def restore():
+    """If a previous version's output is attached as input (Add Input -> Notebook Output), copy its files
+    (caches, step markers, generated data) into this checkout. Nothing is overwritten."""
+    import glob
+    for prev in glob.glob("/kaggle/input/*/repo") + glob.glob("/kaggle/input/*/*/repo"):
+        if os.path.isdir(os.path.join(prev, "data", "cache")):
+            log(f"restore: copying previous run files from {prev}")
+            sh(f"rsync -a --ignore-existing --exclude .git {prev}/ {ROOT}/")
+            return
+    print("-- no previous run attached; starting fresh")
 
 
 # ======================================================================= prep
@@ -98,7 +122,7 @@ def convert():
 @step("index")
 def index():
     from main.data import LitIndex
-    LitIndex.build(start="2019-01-01", max_papers=int(os.environ.get("INDEX_MAX", "300000")))
+    LitIndex.build(start="2019-01-01", max_papers=int(os.environ.get("INDEX_MAX", "150000")))
 
 
 @step("e4_cards")
@@ -216,6 +240,8 @@ def gate_ok():
 def safe(name, fn, *a):
     if (STEPS / f"{name}.done").exists():
         print(f"-- skip {name} (done)"); return
+    if (time.time() - T_START) / 3600 > BUDGET_H:
+        raise OutOfTime(name)
     log(f"start {name}")
     try:
         fn(*a)
@@ -267,6 +293,7 @@ def commit_results():
     paths = ("E2/results E2/calib.json E2/pool_manifest.json E4/results E4/cards.jsonl E6/generations.jsonl "
              "E6/results E6/error_analysis_samples.md main/results main/item_manifest.json kaggle/run_log.md "
              "kaggle/hashes.json")
+    paths = " ".join(x for x in paths.split() if (ROOT / x).exists())
     git(f"add -A {paths}")
     r = subprocess.run(f'git -C {ROOT} commit -m "Results from the Kaggle run" '
                        f'-m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"', shell=True)
@@ -274,8 +301,7 @@ def commit_results():
         push()
 
 
-if __name__ == "__main__":
-    cmd = sys.argv[1]
+def _main(cmd):
     if cmd == "prep":
         prep()
     elif cmd == "gate":
@@ -286,3 +312,19 @@ if __name__ == "__main__":
         commit_results()
     elif cmd == "all":
         prep(); gate(); evaluate(); commit_results()
+
+
+if __name__ == "__main__":
+    cmd = sys.argv[1]
+    restore()
+    try:
+        _main(cmd)
+    except OutOfTime as e:
+        log(f"time budget ({BUDGET_H} h) reached before step {e}; stopping cleanly so the output is saved. "
+            "Re-run with this version's output attached as input to continue.")
+        try:
+            commit_results()
+        except Exception as ex:
+            log(f"commit/push of partial results failed: {ex!r}")
+
+

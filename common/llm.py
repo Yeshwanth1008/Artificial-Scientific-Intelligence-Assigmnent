@@ -124,13 +124,27 @@ class LLM:
     def _local(self, prompt, mnt):
         return self._local_batch([prompt], mnt)[0]
 
-    def _local_batch(self, prompts, mnt, bs=16):
+    def _local_batch(self, prompts, mnt, bs=None):
+        """Batched generation; prompts are sorted by length so a batch carries little padding."""
         import torch
         tok, mdl = self._load_local()
+        bs = bs or int(os.environ.get("LLM_BS", "48" if torch.cuda.is_available() else "4"))
+        order = sorted(range(len(prompts)), key=lambda i: len(prompts[i]))
+        res = [None] * len(prompts)
+        for i in range(0, len(order), bs):
+            idx = order[i:i + bs]
+            if len(order) > bs and i // bs % 20 == 0:
+                print(f"[llm] batch {i // bs + 1}/{(len(order) + bs - 1) // bs}", flush=True)
+            for j, o in zip(idx, self._gen_chunk(tok, mdl, [prompts[k] for k in idx], mnt)):
+                res[j] = o
+        return res
+
+    def _gen_chunk(self, tok, mdl, prompts, mnt):
+        import torch
         out = []
-        for i in range(0, len(prompts), bs):
+        if True:
             chunk = [tok.apply_chat_template([{"role": "user", "content": p}], add_generation_prompt=True, tokenize=False)
-                     for p in prompts[i:i + bs]]
+                     for p in prompts]
             enc = tok(chunk, return_tensors="pt", padding=True).to(mdl.device)
             torch.manual_seed(self.seed)
             with torch.no_grad():
