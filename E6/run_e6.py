@@ -156,6 +156,8 @@ def select_questions(qs, inputs, rule, rng):
     good) and novelty w.r.t. R (1 - max cosine to any input, high is good); keep the top M. If fewer than M
     survive, refill from the dropped ones in original order. QH_rand keeps M at random."""
     qs = [q for q in qs if q]
+    if not qs:  # nothing generated (e.g. the dry collect pass): nothing to select
+        return []
     if rule == "rand":
         return rng.sample(qs, min(M, len(qs)))
     from common.rerank import same_question_scores
@@ -166,6 +168,8 @@ def select_questions(qs, inputs, rule, rng):
         keep.append(q)
     titles = [r["title"] for r in inputs]
     keep2 = [q for q in keep if max(same_question_scores([(q, t) for t in titles])) < 0.5] or keep
+    if not keep2:
+        return []
     E = Embedder("qwen3-0.6b", use_prompt=False)
     Rv = E([f"{r['title']}. {r['abstract']}" for r in inputs]); c = Rv.mean(0); c /= np.linalg.norm(c)
     Qv = E(keep2)

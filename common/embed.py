@@ -63,7 +63,10 @@ class Embedder:
             if k not in self._mem:
                 self._mem[k] = np.load(self.cache_dir / f"{k}.npy")
             out.append(self._mem[k])
-        return np.stack(out) if out else np.zeros((0, 1), np.float32)
+        if out:
+            return np.stack(out)
+        dim = _load(self.name).get_sentence_embedding_dimension()  # empty input: (0, d), not (0, 1)
+        return np.zeros((0, dim), np.float32)
 
 
 def cos_matrix(A, B):
