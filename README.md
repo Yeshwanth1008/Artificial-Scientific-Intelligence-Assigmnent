@@ -2,12 +2,20 @@
 
 Submission repository: Theory (T1–T5), Experiments E1, E2, E4 and E6, and the Main Problem M.
 
-**Compute tier: small.** One encoder (Qwen3-Embedding-0.6B), one cross-encoder (Qwen3-Reranker-0.6B) and one
-language model (Qwen2.5-1.5B-Instruct; 0.5B in the local runs). Everything reported here ran on a CPU-only laptop
-(designed for one free T4 GPU). No paid API was used.
-**Assumed LM training cutoff:** 2024-12-31. Qwen2.5 was released in September 2024; we take a later date to be safe.
-Every claim that rests on the language model is tested on papers or reviews dated after it: E4 tests on ICLR 2026, E6
-on papers from March 2025, and M on items from July 2025.
+**Compute tier: small** (rule R5). Three open models, no paid API:
+* encoder **Qwen3-Embedding-0.6B**: every vector (similarity, novelty, the Φ representation);
+* cross-encoder **Qwen3-Reranker-0.6B**: "same question?" judgements (identity, deduplication, diversity);
+* language model **Qwen2.5-1.5B-Instruct**: extraction of questions, cards and claims, and E6 generation.
+  **Qwen2.5-0.5B-Instruct** was used for the runs on the CPU laptop, for speed (declared in NOTEBOOK.md).
+
+**Where things ran.** On a CPU-only laptop: the Theory checks, E1 (all tasks), the E4 ceiling and the E4 abstract-view
+probe. On a free Kaggle notebook with 2× T4 GPUs (`kaggle/run_all.py`): E2, E4 (question cards, three views,
+reading state), E6 and the Main Problem.
+
+**Assumed LM training cutoff: 2024-12-31** (rule R4). Qwen2.5 was released in September 2024; we take a later
+date to be safe. Every claim that rests on the language model is tested on papers or reviews dated after it:
+E4 tests on ICLR 2026, E6 on papers from March 2025, and the Main Problem on items from July 2025. This guards
+against the model *remembering* outcomes rather than *judging* them (Theory T3 E).
 
 ## Status at submission
 | Part | Status |
