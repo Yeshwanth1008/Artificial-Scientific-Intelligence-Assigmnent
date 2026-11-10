@@ -88,8 +88,16 @@ def in_dir(d, fn, *a):
 def restore():
     """If a previous version's output is attached as input (Add Input -> Notebook Output), copy its files
     (caches, step markers, generated data) into this checkout. Nothing is overwritten."""
-    import glob
-    for prev in glob.glob("/kaggle/input/*/repo") + glob.glob("/kaggle/input/*/*/repo"):
+    cands = []
+    for dirpath, dirnames, _ in os.walk("/kaggle/input"):  # Kaggle's mount layout varies: search every level
+        if os.path.basename(dirpath) == "repo" and os.path.isdir(os.path.join(dirpath, "data", "cache")):
+            cands.append(dirpath)
+            dirnames[:] = []
+        elif dirpath.count(os.sep) > 8:
+            dirnames[:] = []
+    print("-- restore candidates:", cands)
+    for prev in sorted(cands, key=lambda d: -len(os.listdir(os.path.join(d, "data", "cache", "steps")))
+                       if os.path.isdir(os.path.join(d, "data", "cache", "steps")) else 0):
         if os.path.isdir(os.path.join(prev, "data", "cache")):
             log(f"restore: copying previous run files from {prev}")
             sh(f"rsync -a --ignore-existing --exclude .git {prev}/ {ROOT}/")
