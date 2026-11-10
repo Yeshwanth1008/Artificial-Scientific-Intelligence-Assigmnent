@@ -22,7 +22,7 @@ against the model *remembering* outcomes rather than *judging* them (Theory T3 E
 |---|---|
 | Theory T1–T5 | **complete**: `theory/working.pdf`, `theory/answer_sheets.pdf`; all 32 numbers verified by `theory/check_numbers.py` |
 | E1 | **complete** (Tasks 1–4) on 60 items written by Claude (declared deviation): `E1/ANALYSIS.md`, `E1/results.json` |
-| E2 | pools (3 fields × 1000 + 1000 older + 100 focal), LM claims for 299 focal papers and the frozen calibration were produced on Kaggle. **The axiom and human-check evaluations were not run before the deadline** |
+| E2 | Pools, LM claims and calibration produced on Kaggle. **Task 3 human check run (reduced)**: quality-only AUROC 0.652, Y 0.505, density 0.503, both significantly below quality (`E2/ANALYSIS.md`). Task 4 written. The axiom evaluation (Tasks 1–2) was not run |
 | E4 | **Task 1** (ceiling 0.649) and **Task 2, abstract view** (embedding 0.548, TF-IDF 0.553, length 0.504) are complete. Question cards for 5000 papers were produced on Kaggle; views (i)/(ii), Task 3 and Task 4 were not evaluated |
 | E6 | 120 literature + 35 data input sets built and **6,510 generations** produced for all 7 arms on Kaggle. **Not evaluated** before the deadline (`E6/memo.md`) |
 | Main Problem | Φ, readouts, baselines and the full battery are implemented and smoke-tested; 5000 ICLR items built on Kaggle. **The battery was not run** (`main/REPORT.md` lists every test with its reason) |

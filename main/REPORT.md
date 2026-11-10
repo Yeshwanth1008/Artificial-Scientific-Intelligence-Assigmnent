@@ -36,6 +36,10 @@ empty-input, shuffled-input and decoy-question controls (`main/context.py: contr
   recall 0.98): it ranks well but is badly calibrated.
 * Scope: word count orders broader / A / narrower on 55 % of items, better than any embedder (0.18–0.48).
 
+**E2 human check (reduced)**: on 299 ICLR 2026 ideas with reviewer novelty labels, a quality-only baseline reaches
+AUROC 0.652, while nearest-paper distance (0.505) and neighbourhood density (0.503) are at chance and significantly
+below it. The labels are confounded with quality (T2 C.3), and distance novelty does not predict reviewer novelty.
+
 **E4 abstract view** (train ICLR 2024, choose on 2025, test once on ICLR 2026): within-topic pair accuracy is 0.548
 for the embedding probe and 0.553 for TF-IDF, against 0.504 for length and a reviewer ceiling of 0.649, so about a
 third of the explainable signal.
