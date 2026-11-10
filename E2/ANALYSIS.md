@@ -4,11 +4,11 @@
 papers from Jan–Mar 2024), 4–10 LM claims for 299 of the 300 focal papers, and the frozen calibration level
 b = 0.504 for the T2 B.4 measure. **The axiom evaluation (Tasks 1–2) was not run before the deadline.**
 
-## Task 3: human check (reduced, run on the laptop CPU; declared deviation)
+## Task 3: results (run on the laptop CPU; declared deviation)
 Labels: novelty-judge-bench, human-only pointwise, 299 ICLR 2026 ideas (154 validated novel, 145 validated lower
 novelty). Deviations from PREREG: the pool is the 3000 ICLR 2024 + 2025 submissions of the fixed E4 subsample (all
 dated before the ICLR 2026 deadline) instead of 5000 arXiv papers. N and the T2 B.4 measure were not computed
-(they need LM claims for the 299 ideas). Reproduce with `python E2/human_check_local.py`.
+(they need LM claims for the 299 ideas). Reproduce with `python E2/results_task3.py`.
 
 | Score | AUROC [95 % CI] | Minus quality-only [95 % CI] |
 |---|---|---|

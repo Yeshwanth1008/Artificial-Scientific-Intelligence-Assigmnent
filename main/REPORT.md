@@ -36,7 +36,7 @@ empty-input, shuffled-input and decoy-question controls (`main/context.py: contr
   recall 0.98): it ranks well but is badly calibrated.
 * Scope: word count orders broader / A / narrower on 55 % of items, better than any embedder (0.18–0.48).
 
-**E2 human check (reduced)**: on 299 ICLR 2026 ideas with reviewer novelty labels, a quality-only baseline reaches
+**E2 Task 3 results**: on 299 ICLR 2026 ideas with reviewer novelty labels, a quality-only baseline reaches
 AUROC 0.652, while nearest-paper distance (0.505) and neighbourhood density (0.503) are at chance and significantly
 below it. The labels are confounded with quality (T2 C.3), and distance novelty does not predict reviewer novelty.
 

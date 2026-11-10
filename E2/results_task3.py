@@ -1,4 +1,4 @@
-"""E2 Task 3 (reduced, local CPU, declared deviation): novelty-judge-bench human-only labels (299 ICLR 2026 ideas).
+"""E2 Task 3 results (local CPU, declared deviation): novelty-judge-bench human-only labels (299 ICLR 2026 ideas).
 
 * quality-only baseline: ridge on frozen Qwen3 abstract embeddings, trained on the fixed E4 ICLR 2024 subsample,
   alpha chosen on the ICLR 2025 subsample (targets: mean reviewer rating);
@@ -6,7 +6,7 @@
   (3000 submissions, all dated before the ICLR 2026 deadline), instead of the pre-registered 5000 arXiv papers;
 * N and the T2 B.4 measure need claim extraction with the LM and are not computed here.
 AUROC with a 2000-sample bootstrap over ideas; each novelty measure minus the quality baseline.
-    python E2/human_check_local.py
+    python E2/results_task3.py
 """
 import sys
 from pathlib import Path
@@ -59,7 +59,7 @@ for m in ("Y", "density"):
     out[m]["minus_quality"] = out[m]["auroc"] - out["quality_only"]["auroc"]
     out[m]["minus_quality_ci"] = [float(np.nanquantile(d, .025)), float(np.nanquantile(d, .975))]
 (ROOT / "E2" / "results").mkdir(exist_ok=True)
-write_json(ROOT / "E2" / "results" / "human_check_local.json", out)
+write_json(ROOT / "E2" / "results" / "results.json", out)
 for m in scores:
     print(m, round(out[m]["auroc"], 3), [round(x, 3) for x in out[m]["ci"]],
           "" if m == "quality_only" else f"minus quality {out[m]['minus_quality']:+.3f} {[round(x,3) for x in out[m]['minus_quality_ci']]}")
