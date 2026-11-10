@@ -27,6 +27,25 @@ empty-input, shuffled-input and decoy-question controls (`main/context.py: contr
 
 ## 2. What was run on real data
 
+**E1 (60 items, written by Claude, declared deviation):**
+* All four embedders put a one-word near-miss closer to the question than a faithful paraphrase on **every** item
+  (near-miss error 1.00). The instructed cross-encoder halves this (0.48), almost never confuses a one-word edit
+  with a different question (0.02), and catches every constraint flip (0.00). But it treats "how does…" and "why
+  does…" as the same question 92 % of the time.
+* At a fixed 0.5 threshold the cross-encoder accepts 93 % of the near-misses in deduplication (precision 0.28,
+  recall 0.98): it ranks well but is badly calibrated.
+* Scope: word count orders broader / A / narrower on 55 % of items, better than any embedder (0.18–0.48).
+
+**E4 abstract view** (train ICLR 2024, choose on 2025, test once on ICLR 2026): within-topic pair accuracy is 0.548
+for the embedding probe and 0.553 for TF-IDF, against 0.504 for length and a reviewer ceiling of 0.649, so about a
+third of the explainable signal.
+
+**Data and generations produced on Kaggle (2× T4)** but not yet evaluated: a 150k-paper arXiv literature index,
+5000 E4 question cards, the E2 pools, claims and calibration, the E6 testbeds and 6,510 generations, and 5000 ICLR
+items for the Main Problem.
+
+### Earlier summary
+
 | Item | Data | Result |
 |---|---|---|
 | E4 Task 1: reviewer ceiling | ICLR 2026, 19,471 papers (public OpenReview mirror) | Half-panels agree on **64.9 %** of within-topic pairs whose half-1 means differ by > 1 point (SD 0.5 % over 20 splits) |
@@ -41,18 +60,23 @@ reviewers themselves share.
 
 | Test | Tier | Status | Reason |
 |---|---|---|---|
-| I1 paraphrase | core | not run | needs the E1 hand-written items, which are not finished |
+| I1 paraphrase | core | not run | E1 items exist (60); needs Φ encoded with the literature index on the GPU, not reached before the deadline |
 | I3 length | core | not run | needs Φ encoded on the ICLR test set (GPU budget) |
-| S1 near-miss | core | not run | needs the E1 items |
-| A1 novelty axioms | core | not run | E2 claim extraction (LM) did not finish on CPU |
+| S1 near-miss | core | not run | same as I1. E1 shows the cross-encoder that Φ relies on scores 0.48 on near-miss vs paraphrase (B-Q embedders: 1.00) |
+| A1 novelty axioms | core | not run | E2 pools, claims and calibration are done on Kaggle; the axiom evaluation was not reached before the deadline |
 | H1 expert battles | core | not run | Ideation Arena data found (HF `yolo1213811/research-ideation-arena-dataset`, 0.8 GB) but not converted |
 | H3 review scores | core | not run | needs Φ on the test set; the E4 abstract-view probe is the closest finished result |
-| O1 post-cutoff quality | core | not run | needs Φ and 12-month citation counts (Semantic Scholar key) |
-| O2 same inputs | core | not run | needs Semantic Scholar references |
+| O1 post-cutoff quality | core | not run | the citation factor needs Semantic Scholar data; unauthenticated requests from Kaggle were rate-limited (HTTP 429) |
+| O2 same inputs | core | not run | same Semantic Scholar rate limit |
 | T1 time invariance | core | not run | needs Φ on the test set |
 | I2, I4, S2, S3, H2, H4, O3, K1, T2, R1, G, D | extended | not run | same compute limits. S3 behaves as specified on a toy index (an earlier equivalent paper lowers all four N coordinates; a later one changes none) |
 
 ## 4. Insight so far
+* **Identity needs more than a cosine, and more than this cross-encoder.** Embedders read "same words" as "same
+  question" (E1). The cross-encoder fixes most near-miss types but not inquiry changes, and its 0.5 threshold is
+  badly calibrated. A same-question readout must use a calibrated threshold, or a relative test against the
+  question's own paraphrases.
+* **Scope must be tested on length-flipped items**, because word count is a strong but meaningless predictor (T1 C.1).
 * **Reviewer agreement is low (64.9 %).** Any quality readout has to be judged against this ceiling, not against
   100 %.
 * **The public novelty labels are confounded with quality.** novelty-judge-bench builds its "novel" class from

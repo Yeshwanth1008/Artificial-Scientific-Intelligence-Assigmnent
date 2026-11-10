@@ -47,3 +47,12 @@ Dated log of decisions. Every abandoned idea gets one line saying why it was dro
 * 2026-11-08 — **Deviation (E1):** the 60 E1 items (h001–h060) were written by Claude, not by hand, at my request,
   and this is declared to the organisers. Consequence: the test is partly circular, and the human 24-hour re-check
   and second reader were not done. Every E1 result is reported with this caveat.
+* 2026-11-08/10 — Kaggle runs (2× T4). Run 1 crashed in E6 (an empty selection in the dry prefill pass; fixed).
+  Run 2: the encoder silently stayed on the CPU after the multi-GPU index pool (E2 preparation took 4 h; fixed), and
+  long E6 prompts ran out of GPU memory (fixed by token-budget batching). Run 4: all preparation finished (index,
+  5000 E4 cards, E2 pools/claims/calibration, E6 testbeds and 6,510 generations, 5000 ICLR items), then Semantic
+  Scholar rate-limited the citation requests (HTTP 429; made non-fatal). Restoring from a previous output failed
+  twice because Kaggle mounts notebook outputs at a different depth (fixed: recursive search).
+* 2026-11-10 — **Deadline reached before the evaluation phase ran on Kaggle.** E2 axioms and human check, E4 views
+  (i)/(ii), reading state and summary, E6 evaluation and the Main Problem battery are not reported. Nothing was
+  estimated in their place.

@@ -15,6 +15,9 @@ Every substantive use of an AI assistant (rule R1), with what I checked.
 | Claude Code + fixed prompt `EXTRACT_RQ` | E1 workbook: selected 75 real 2025 arXiv papers and extracted question A with the one fixed prompt | Used only to choose the papers |
 | Claude Code | **Wrote all 60 E1 items (every field, A included) at my request**, instead of writing them by hand as Task 1 asks (`E1/build_contrast.py`) | Declared deviation: E1 is partly circular (an LM wrote the items that test LMs). Checker passes; no human 24-hour re-check |
 
+| Claude Code | Kaggle pipeline (`kaggle/run_all.py`), batched generation, and the fixes after each failed run (see NOTEBOOK.md) | Each fix was tested locally before the next run; run logs checked line by line |
+| Claude Code | Final README, REPORT and E6 memo status at the deadline | Every reported number traced to a result file; everything not run is listed as not run |
+
 ## AI errors caught
 1. **T5 B.1 (other AI).** The "far" question was given prior π = 0.99 ("settled"), but the reports were about
    contrastive learning, so nothing in them could settle it. Replaced with a question whose measurement does not
