@@ -1,0 +1,253 @@
+{
+  "deviations": [
+    "Real arXiv pools from E2/pools (cs.CL, cs.CV, cs.RO). Deviations from PREREG, all forced by the CPU time budget:",
+    "  * encoder bge-small-en-v1.5 instead of Qwen3-Embedding-0.6B;",
+    "  * 300 papers per pool instead of 1000; 8 focal papers per field instead of 100;",
+    "  * claims = the first 4-8 sentences of the focal abstract (no LM extraction);",
+    "  * the paraphrased-copy manipulation is skipped (it needs LM paraphrases);",
+    "  * calibration b for `yours` estimated once on the older pools before any manipulation, then frozen.",
+    "Manipulations and expected directions are those of E2/run_e2.py."
+  ],
+  "n_focal": 24,
+  "calibration_b": 0.6575961768627167,
+  "exact_copy": {
+    "Y": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "density": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "N": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "yours": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    }
+  },
+  "partial_25": {
+    "Y": {
+      "est": 0.625,
+      "lo": 0.4166666666666667,
+      "hi": 0.8333333333333334,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "density": {
+      "est": 0.5,
+      "lo": 0.2916666666666667,
+      "hi": 0.7083333333333334,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "N": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "yours": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    }
+  },
+  "partial_50": {
+    "Y": {
+      "est": 0.5,
+      "lo": 0.2916666666666667,
+      "hi": 0.7083333333333334,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "density": {
+      "est": 0.375,
+      "lo": 0.16666666666666666,
+      "hi": 0.5833333333333334,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "N": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "yours": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    }
+  },
+  "partial_75": {
+    "Y": {
+      "est": 0.375,
+      "lo": 0.20833333333333334,
+      "hi": 0.5416666666666666,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "density": {
+      "est": 0.25,
+      "lo": 0.08333333333333333,
+      "hi": 0.4166666666666667,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "N": {
+      "est": 0.9583333333333334,
+      "lo": 0.875,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "yours": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    }
+  },
+  "partial_100": {
+    "Y": {
+      "est": 0.25,
+      "lo": 0.08333333333333333,
+      "hi": 0.4166666666666667,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "density": {
+      "est": 0.20833333333333334,
+      "lo": 0.08333333333333333,
+      "hi": 0.375,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "N": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "yours": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    }
+  },
+  "concentrated_3": {
+    "Y": {
+      "est": 0.7916666666666666,
+      "lo": 0.625,
+      "hi": 0.9583333333333334,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "density": {
+      "est": 0.20833333333333334,
+      "lo": 0.041666666666666664,
+      "hi": 0.375,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "N": {
+      "est": 0.2916666666666667,
+      "lo": 0.125,
+      "hi": 0.4583333333333333,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "yours": {
+      "est": 1.0,
+      "lo": 1.0,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    }
+  },
+  "far_pool": {
+    "Y": {
+      "est": 0.9166666666666666,
+      "lo": 0.7916666666666666,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "density": {
+      "est": 0.7083333333333334,
+      "lo": 0.5416666666666666,
+      "hi": 0.875,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "N": {
+      "est": 0.9583333333333334,
+      "lo": 0.875,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "yours": {
+      "est": 0.9166666666666666,
+      "lo": 0.7916666666666666,
+      "hi": 1.0,
+      "n": 24,
+      "n_clusters": 24
+    }
+  },
+  "older_pool": {
+    "Y": {
+      "est": 0.7083333333333334,
+      "lo": 0.5,
+      "hi": 0.875,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "density": {
+      "est": 0.5,
+      "lo": 0.2916666666666667,
+      "hi": 0.6677083333333276,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "N": {
+      "est": 0.625,
+      "lo": 0.4166666666666667,
+      "hi": 0.7916666666666666,
+      "n": 24,
+      "n_clusters": 24
+    },
+    "yours": {
+      "est": 0.6666666666666666,
+      "lo": 0.4583333333333333,
+      "hi": 0.8333333333333334,
+      "n": 24,
+      "n_clusters": 24
+    }
+  }
+}
