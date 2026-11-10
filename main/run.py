@@ -53,6 +53,9 @@ def cmd_fit():
         get = (lambda r: r["scores"][target]) if kind == "iclr" else (lambda r: r[target])
         tr = [r for r in ctx.split(kind, "train") if not np.isnan(get(r))]
         se = [r for r in ctx.split(kind, "select") if not np.isnan(get(r))]
+        if len(tr) < 100 or len(se) < 30:
+            print(f"{head}: not fitted (only {len(tr)} train / {len(se)} select items)")
+            continue
         m.fit_head(head, [ctx.phi_item(r) for r in tr], np.array([get(r) for r in tr]),
                    [ctx.phi_item(r) for r in se], np.array([get(r) for r in se]))
         print(head, "alpha =", m.heads[head][2])

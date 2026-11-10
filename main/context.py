@@ -39,7 +39,8 @@ class Ctx:
     def split(self, kind, split):
         key = (kind, split)
         if key not in self._items:
-            rows = [r for r in read_jsonl(HERE / f"items_{kind}.jsonl") if r["split"] == split]
+            f = HERE / f"items_{kind}.jsonl"
+            rows = [r for r in read_jsonl(f) if r["split"] == split] if f.exists() else []
             n = CONFIG[f"n_{kind}"][split]
             if n and len(rows) > n:
                 rows = random.Random(0).sample(sorted(rows, key=lambda r: r["id"]), n)

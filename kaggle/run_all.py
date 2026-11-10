@@ -26,6 +26,11 @@ for _d in ("E2", "E4", "E6"):
 os.chdir(ROOT)
 os.environ.setdefault("EMB_DISK_CACHE", "0")
 os.environ.setdefault("LLM_LOCAL_MODEL", "Qwen/Qwen2.5-1.5B-Instruct")
+try:  # optional Semantic Scholar key stored as a Kaggle secret named S2_API_KEY
+    from kaggle_secrets import UserSecretsClient
+    os.environ.setdefault("S2_API_KEY", UserSecretsClient().get_secret("S2_API_KEY"))
+except Exception:
+    pass
 
 from common.io import DATA, read_jsonl, sha256_list, write_json  # noqa: E402
 
@@ -158,9 +163,13 @@ def e6_prep():
 @step("m_data")
 def m_data():
     from main import data as md
-    md.build_iclr()
-    md.build_uptake()
-    md.build_groups()
+    if not (ROOT / "main" / "items_iclr.jsonl").exists():
+        md.build_iclr()
+    try:  # citation data comes from Semantic Scholar, which may rate-limit shared cloud IPs
+        md.build_uptake()
+        md.build_groups()
+    except Exception as e:
+        log(f"uptake data incomplete ({e!r}); citation-based tests (O1 uptake, O2) will be reported as not run")
 
 
 def current_hashes():

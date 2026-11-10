@@ -292,6 +292,10 @@ def H4_facet_similarity(ctx: Ctx):
 def O1_post_cutoff(ctx: Ctx):
     out = {"review": H3_review_scores(ctx)["vs_B_Q"]}
     te = ctx.split("uptake", "test")
+    if "q_uptake" not in ctx.model.heads or len(te) < 50:
+        out["uptake"] = {"not_run": f"citation data unavailable (Semantic Scholar rate limit; {len(te)} test items)"}
+        out["pass"] = None
+        return out
     y = np.array([r["log_uptake"] for r in te])
     topics = ctx.uptake_topics(te)
     q = np.array([ctx.model.quality(ctx.phi_item(r))["q_uptake"] for r in te])
@@ -306,6 +310,8 @@ def O2_same_inputs(ctx: Ctx):
     f = ROOT / "main" / "o2_pairs.jsonl"
     if not f.exists():
         return {"not_run": "run python -m main.data groups"}
+    if "q_uptake" not in ctx.model.heads:
+        return {"not_run": "citation data unavailable (Semantic Scholar rate limit)"}
     pairs = read_jsonl(f)
     te = {r["id"]: r for r in ctx.split("uptake", "test")}
     pairs = [p for p in pairs if p["a"] in te and p["b"] in te and te[p["a"]]["uptake12"] != te[p["b"]]["uptake12"]]

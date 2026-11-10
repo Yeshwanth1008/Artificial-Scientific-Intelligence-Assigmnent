@@ -137,13 +137,22 @@ def s2_batch(ids, fields, chunk=100, cache_name="s2_batch"):
     h = {"x-api-key": os.environ["S2_API_KEY"]} if os.environ.get("S2_API_KEY") else {}
     for k in range(0, len(todo), chunk):
         part = todo[k:k + chunk]
-        for attempt in range(10):
-            r = requests.post(f"{S2}/paper/batch", params={"fields": fields}, json={"ids": part}, headers=h, timeout=120)
-            if r.status_code == 200:
-                break
-            time.sleep(min(60, 2 ** attempt))
-        else:
-            raise RuntimeError(f"S2 batch failed ({r.status_code})")
+        ok = False
+        for attempt in range(8):
+            try:
+                r = requests.post(f"{S2}/paper/batch", params={"fields": fields}, json={"ids": part}, headers=h,
+                                  timeout=120)
+                if r.status_code == 200:
+                    ok = True
+                    break
+            except requests.RequestException:
+                pass
+            time.sleep(min(120, 5 * 2 ** attempt))
+        if not ok:  # rate-limited for good (shared cloud IPs): keep what arrived, report the gap
+            print(f"[s2] chunk {k // chunk + 1} failed after retries; {len(todo) - k} ids left without data", flush=True)
+            if not h:
+                break  # without a key, more requests from this IP will fail too
+            continue
         for i, rec in zip(part, r.json()):
             out[i] = rec
             path(i).write_text(json.dumps(rec), encoding="utf-8")
